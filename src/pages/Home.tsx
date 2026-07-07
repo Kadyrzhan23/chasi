@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import WatchSVG from '../components/WatchSVG'
 import WatchVisual from '../components/WatchVisual'
 import { products } from '../data/mock'
@@ -50,24 +50,13 @@ function Counter({ end, suffix = '' }: { end: number; suffix?: string }) {
 
 export default function Home() {
   useReveal()
+  const navigate = useNavigate()
   const { authed } = useAuth()
   const { theme } = useTheme()
-  const [views, setViews] = useState<Record<number, number>>({})
   const [wl, setWl] = useState(37)
   const [wlInput, setWlInput] = useState('')
 
-  const clickCard = (id: number, name: string) => {
-    setViews(v => {
-      const n = (v[id] ?? 0) + 1
-      if (n === 3) {
-        toast({
-          title: 'Персональное предложение ✦',
-          text: `Вы просмотрели «${name}» 3 раза — держите скидку −10%, действует 48 часов. Так это сообщение получит клиент в Telegram.`,
-        })
-      }
-      return { ...v, [id]: n }
-    })
-  }
+  const openProduct = (id: number) => navigate(`/product/${id}`)
 
   return (
     <>
@@ -104,14 +93,14 @@ export default function Home() {
         </div>
         <div className="grid4">
           {featured.map((p, i) => (
-            <div key={p.id} className="card reveal" style={{ transitionDelay: `${i * 0.1}s` }} onClick={() => clickCard(p.id, p.name)}>
-              {(views[p.id] ?? 0) >= 3 && <div className="badge gold">−10% для вас</div>}
-              {(views[p.id] ?? 0) > 0 && <div className="badge">просмотров: {views[p.id]}</div>}
+            <div key={p.id} className="card reveal" style={{ transitionDelay: `${i * 0.1}s` }} onClick={() => openProduct(p.id)}>
+              {!p.inStock && <div className="badge red">под заказ</div>}
               <div className="w"><WatchVisual product={p} /></div>
               <h3>{p.name}</h3>
               <div className="cat">{p.style === 'diver' ? 'Дайверские' : p.style === 'dress' ? 'Классика' : 'Спорт'} · Оригинал</div>
               <div className={`price ${authed ? '' : 'locked'}`}>{p.price.toLocaleString('ru-RU')} $</div>
               <div className="lock-note">🔒 Войдите, чтобы увидеть цену</div>
+              <div className="card-cta muted">Открыть карточку →</div>
             </div>
           ))}
         </div>

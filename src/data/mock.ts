@@ -280,3 +280,74 @@ export const myNotifications = [
   { id: 3, title: 'Товар из wishlist в наличии', body: 'Omega Seamaster Diver 300M снова в бутике. Вы в списке первых — бронь действует 72 часа.', date: '29.06.2026, 12:10', kind: 'Wishlist' },
   { id: 4, title: 'Начислены баллы', body: '+124 балла за покупку. Ваш уровень: Gold. До Platinum осталось 2 760 баллов.', date: '14.08.2025, 15:47', kind: 'Баллы' },
 ]
+
+/* ============ ПОДАРОЧНЫЙ БОКС (доп. услуга при оформлении) ============ */
+export const GIFT_BOX = {
+  price: 25,
+  title: 'Подарочный бокс CHASI.UZ',
+  desc: 'Премиальная коробка с ложементом, фирменная лента, открытка с рукописным пожеланием и пакет для переноски. Часы будут выглядеть презентабельно как подарок.',
+}
+
+/* ============ ПОДАРОЧНЫЕ НАБОРЫ (кастомные комплекты к часам) ============ */
+export type GiftSet = {
+  id: number
+  name: string
+  tagline: string
+  price: number
+  items: string[]           // что входит
+  dial: [string, string]    // для визуала-заглушки
+  accent: string
+  popular?: boolean
+}
+
+export const giftSets: GiftSet[] = [
+  {
+    id: 101, name: 'Набор «Джентльмен»', tagline: 'Классика для делового подарка', price: 60,
+    items: ['Подарочный бокс с ложементом', 'Кожаный чехол для часов', 'Салфетка из микрофибры', 'Открытка с пожеланием'],
+    dial: ['#2b2118', '#120d08'], accent: '#d4af6a', popular: true,
+  },
+  {
+    id: 102, name: 'Набор «Дайвер»', tagline: 'Для активных и спортивных', price: 75,
+    items: ['Влагозащищённый бокс', 'Запасной каучуковый ремешок', 'Инструмент для смены ремешка', 'Фирменная наклейка'],
+    dial: ['#0e2a1e', '#05130c'], accent: '#7fc97f',
+  },
+  {
+    id: 103, name: 'Набор «Престиж»', tagline: 'Максимально презентабельно', price: 120,
+    items: ['Премиальный бокс из эко-кожи', 'Шкатулка-подставка для часов', 'Средство для чистки', 'Сертификат подлинности в рамке', 'Открытка + лента'],
+    dial: ['#16213a', '#090d18'], accent: '#6ab3d4', popular: true,
+  },
+  {
+    id: 104, name: 'Набор «Она»', tagline: 'Нежный подарок для неё', price: 70,
+    items: ['Подарочный бокс пастельных тонов', 'Мини-шкатулка для украшений', 'Открытка с пожеланием', 'Фирменная лента'],
+    dial: ['#ece7dc', '#c4bca9'], accent: '#c98aa8',
+  },
+]
+
+/* ============ КОРЗИНА И ЗАКАЗЫ С САЙТА (localStorage, без сервера) ============ */
+export type CartItem = {
+  productId: number
+  qty: number
+}
+
+export type PaymentMethod = 'payme' | 'click' | 'cod'
+export const PAYMENT_LABEL: Record<PaymentMethod, string> = {
+  payme: 'Payme',
+  click: 'Click',
+  cod: 'Оплата при получении',
+}
+
+export type OrderStatus = 'новый' | 'оформлен'
+
+export type OnlineOrder = {
+  id: string
+  createdAt: string          // ISO
+  items: CartItem[]
+  giftBox: boolean
+  giftSetId: number | null
+  payment: PaymentMethod
+  customer: { name: string; phone: string; address: string; comment: string }
+  itemsTotal: number         // сумма часов
+  extrasTotal: number        // бокс + набор
+  total: number
+  status: OrderStatus
+}

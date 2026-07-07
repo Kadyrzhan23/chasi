@@ -2,9 +2,13 @@ import { createContext, useContext, useEffect, useState } from 'react'
 import { HashRouter, NavLink, Route, Routes } from 'react-router-dom'
 import Home from './pages/Home'
 import Catalog from './pages/Catalog'
+import Product from './pages/Product'
+import GiftSets from './pages/GiftSets'
+import Cart from './pages/Cart'
 import Account from './pages/Account'
 import Admin from './pages/Admin'
 import Passport from './pages/Passport'
+import { CartProvider, useCart } from './store/cart'
 import { onToast, toast, ToastMsg } from './toast'
 
 /* ---------- auth (демо) ---------- */
@@ -51,6 +55,7 @@ function ToastHost() {
 const LINKS = [
   { to: '/', label: 'Главная', end: true },
   { to: '/catalog', label: 'Каталог' },
+  { to: '/gift-sets', label: 'Наборы' },
   { to: '/account', label: 'Кабинет' },
   { to: '/admin', label: 'CRM · демо' },
 ]
@@ -58,6 +63,7 @@ const LINKS = [
 function Header() {
   const { authed, toggle } = useAuth()
   const { theme, setTheme } = useTheme()
+  const { count } = useCart()
   const [open, setOpen] = useState(false)
   const cls = ({ isActive }: { isActive: boolean }) => (isActive ? 'active' : '')
   return (
@@ -75,6 +81,14 @@ function Header() {
               </button>
             ))}
           </div>
+          <NavLink to="/cart" className="cart-link" title="Корзина" onClick={() => setOpen(false)}>
+            <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M4.5 7.5h15l-1.1 11.2a1.6 1.6 0 0 1-1.6 1.45H7.2a1.6 1.6 0 0 1-1.6-1.45L4.5 7.5Z" />
+              <path d="M8.6 7.5V6.4a3.4 3.4 0 0 1 6.8 0v1.1" />
+              <path d="M9.4 11v1.1a2.6 2.6 0 0 0 5.2 0V11" opacity="0.75" />
+            </svg>
+            {count > 0 && <span className="cart-count">{count}</span>}
+          </NavLink>
           <button className={`auth-btn ${authed ? 'on' : ''}`} onClick={toggle}>
             {authed ? 'Азиз ✦' : 'Войти'}
           </button>
@@ -152,12 +166,16 @@ export default function App() {
     <AuthCtx.Provider value={{ authed, toggle }}>
       <ThemeCtx.Provider value={{ theme, setTheme }}>
       <HashRouter>
+        <CartProvider>
         <div className={authed ? 'authed' : ''} data-theme={theme}>
           <Header />
           <div className="page">
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/catalog" element={<Catalog />} />
+              <Route path="/product/:id" element={<Product />} />
+              <Route path="/gift-sets" element={<GiftSets />} />
+              <Route path="/cart" element={<Cart />} />
               <Route path="/account" element={<Account />} />
               <Route path="/admin" element={<Admin />} />
               <Route path="/passport/:serial" element={<Passport />} />
@@ -166,6 +184,7 @@ export default function App() {
           </div>
           <ToastHost />
         </div>
+        </CartProvider>
       </HashRouter>
       </ThemeCtx.Provider>
     </AuthCtx.Provider>
