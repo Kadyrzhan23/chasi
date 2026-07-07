@@ -29,11 +29,28 @@ export type Product = {
   reserve: number        // ч запас хода
   movement: 'автоподзавод' | 'кварц' | 'механика'
   inStock: boolean
+  stock: number          // остаток на складе (шт.)
+  discount: number       // скидка на модель, %
   dial: [string, string]
   accent: string
 }
 
-export const products: Product[] = [
+// Порог «мало осталось» — ниже показываем срочность на витрине
+export const LOW_STOCK = 3
+// Варианты скидок для управления в CRM
+export const DISCOUNT_OPTIONS = [0, 5, 10, 15, 20] as const
+
+// Базовые данные без изменяемых полей склада — остаток/скидку добавляем ниже
+type ProductBase = Omit<Product, 'stock' | 'discount'>
+
+// Стартовые остатки (демо): часть моделей специально с малым запасом,
+// чтобы показать срочность «осталось N — торопитесь». 0 — для «под заказ».
+const START_STOCK: Record<number, number> = {
+  1: 7, 2: 4, 3: 6, 4: 9, 5: 0, 6: 5, 7: 3, 8: 2,
+  9: 3, 10: 8, 11: 1, 12: 12, 13: 4, 14: 6, 15: 0, 16: 3,
+}
+
+const rawProducts: ProductBase[] = [
   { id: 1,  name: 'Tissot Seastar 1000',        brand: 'Tissot',              category: 'original',    style: 'diver',  gender: 'муж',     price: 850,  diameter: 43,   glass: 'сапфировое',  water: 300, reserve: 80, movement: 'автоподзавод', inStock: true,  dial: ['#123241', '#07141b'], accent: '#d4af6a' },
   { id: 2,  name: 'Longines HydroConquest',     brand: 'Longines',            category: 'original',    style: 'sport',  gender: 'муж',     price: 1750, diameter: 41,   glass: 'сапфировое',  water: 300, reserve: 72, movement: 'автоподзавод', inStock: true,  dial: ['#1c1f2b', '#0a0b11'], accent: '#f0d9a8' },
   { id: 3,  name: 'Frederique Constant Classics', brand: 'Frederique Constant', category: 'original',  style: 'dress',  gender: 'муж',     price: 1300, diameter: 40,   glass: 'сапфировое',  water: 50,  reserve: 38, movement: 'автоподзавод', inStock: true,  dial: ['#2b2118', '#120d08'], accent: '#d4af6a' },
@@ -51,6 +68,12 @@ export const products: Product[] = [
   { id: 15, name: 'Rolex GMT-Master II',        brand: 'Rolex',               category: 'clone-swiss', style: 'diver',  gender: 'муж',     price: 820,  diameter: 40,   glass: 'сапфировое',  water: 100, reserve: 70, movement: 'автоподзавод', inStock: false, dial: ['#1a1030', '#0b0616'], accent: '#e07a7a' },
   { id: 16, name: 'Cartier Santos Medium',      brand: 'Cartier',             category: 'aaaa',        style: 'dress',  gender: 'жен',     price: 480,  diameter: 35,   glass: 'сапфировое',  water: 100, reserve: 42, movement: 'автоподзавод', inStock: true,  dial: ['#ece7dc', '#c4bca9'], accent: '#8a6d3b' },
 ]
+
+export const products: Product[] = rawProducts.map(p => ({
+  ...p,
+  stock: START_STOCK[p.id] ?? 6,
+  discount: 0,
+}))
 
 export const brands = [...new Set(products.map(p => p.brand))].sort()
 

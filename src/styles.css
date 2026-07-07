@@ -457,3 +457,77 @@ footer{border-top:1px solid var(--line);padding:56px 4vw 26px;background:var(--b
   .cart-row .qty{grid-column:1/3;justify-content:flex-start}
   .cart-price{grid-column:1/3}
 }
+
+/* ============ СКЛАД / СТАТУСЫ ТОВАРОВ (feature/shop-cart) ============ */
+
+/* угловые бейджи на карточке каталога */
+.card-corner{position:absolute;top:12px;z-index:3;display:flex;flex-direction:column;gap:6px;pointer-events:none}
+.card-corner.left{left:12px;align-items:flex-start}
+.card-corner.right{right:12px;align-items:flex-end}
+.cbadge{font-size:.6rem;letter-spacing:.07em;text-transform:uppercase;padding:4px 9px;border-radius:20px;border:1px solid var(--line);background:var(--bg);color:var(--muted);white-space:nowrap;line-height:1.4}
+.cbadge.orig{color:var(--green);border-color:rgba(127,201,127,.4)}
+.cbadge.copy{color:var(--blue);border-color:rgba(106,179,212,.4)}
+.cbadge.gold{background:var(--gold);color:var(--ongold);border:none;font-weight:700}
+.cbadge.stock-ok{color:var(--green);border-color:rgba(127,201,127,.4)}
+.cbadge.stock-low{color:var(--red);border-color:rgba(224,122,122,.5);background:rgba(224,122,122,.08);font-weight:600}
+.cbadge.stock-order{color:var(--red);border-color:rgba(224,122,122,.45)}
+
+/* срочность на странице товара */
+.urgency{border:1px solid rgba(224,122,122,.5);background:rgba(224,122,122,.08);color:var(--red);border-radius:var(--rad);padding:12px 16px;font-size:.85rem;font-weight:500;margin-bottom:20px}
+.save-pill{display:inline-block;margin-left:12px;font-size:.68rem;letter-spacing:.06em;font-weight:600;color:var(--ongold);background:var(--gold);padding:4px 10px;border-radius:20px;vertical-align:middle;-webkit-text-fill-color:var(--ongold)}
+
+/* CRM · управление товарами */
+.prod-admin{display:flex;flex-direction:column;gap:12px}
+.prow{display:grid;grid-template-columns:1.4fr 1fr .9fr 1.3fr;gap:20px;align-items:start;border:1px solid var(--line2);border-radius:var(--rad);background:var(--panel);padding:18px 20px}
+.prow-name b{font-size:1rem}
+.prow-price{margin-top:8px;font-size:.95rem;color:var(--gold2)}
+.prow-ctrl{display:flex;flex-direction:column;gap:8px}
+.prow-label{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold)}
+.stepper{display:flex;align-items:center;gap:12px}
+.stepper button{width:30px;height:30px;border:1px solid var(--line);background:transparent;color:var(--gold2);font-size:1.1rem;cursor:pointer;border-radius:var(--btnrad);transition:.2s;line-height:1}
+.stepper button:hover:not(:disabled){border-color:var(--gold);background:var(--wash)}
+.stepper button:disabled{opacity:.35;cursor:not-allowed}
+.stepper span{min-width:52px;text-align:center;font-size:.9rem}
+
+@media(max-width:1000px){
+  .prow{grid-template-columns:1fr 1fr;gap:16px}
+}
+@media(max-width:560px){
+  .prow{grid-template-columns:1fr}
+}
+
+/* ============ ТЕГИ, ФИЛЬТРЫ, РЕДАКТИРОВАНИЕ ТОВАРА (feature/shop-cart) ============ */
+
+/* кликабельные угловые бейджи карточки */
+.card-corner a.cbadge{pointer-events:auto;text-decoration:none;cursor:pointer;transition:.2s}
+.card-corner a.cbadge:hover{filter:brightness(1.15);transform:translateY(-1px)}
+
+/* активные фильтры над списком каталога */
+.active-filters{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:22px;padding:14px 16px;border:1px solid var(--line2);border-radius:var(--rad);background:var(--panel)}
+.afchip{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--gold);background:rgba(212,175,106,.08);color:var(--gold2);padding:6px 12px;border-radius:20px;font-size:.74rem;cursor:pointer;transition:.2s}
+.afchip:hover{background:var(--gold);color:var(--ongold)}
+.afchip span{opacity:.7;font-size:.8rem}
+
+/* теги-чипы на странице товара */
+.tagrow{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px}
+.tagchip{display:inline-block;border:1px solid var(--line2);color:var(--text);background:var(--wash);padding:7px 14px;border-radius:20px;font-size:.76rem;text-decoration:none;transition:.25s;white-space:nowrap}
+.tagchip:hover{border-color:var(--gold);color:var(--gold2);background:rgba(212,175,106,.08)}
+
+/* CRM · редактирование товара */
+.edit-head{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap;margin-bottom:26px}
+.edit-layout{display:grid;grid-template-columns:1.5fr 1fr;gap:26px;align-items:start;margin-bottom:20px}
+.edit-form{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.edit-field{display:flex;flex-direction:column;gap:8px}
+.edit-field label{font-size:.66rem;letter-spacing:.16em;text-transform:uppercase;color:var(--gold)}
+.edit-field .search-inp{margin-bottom:0}
+.edit-preview{display:flex;flex-direction:column;gap:20px;position:sticky;top:96px}
+.edit-preview .card{cursor:default}
+.edit-preview .card:hover{transform:none;border-color:transparent;box-shadow:none}
+
+@media(max-width:1000px){
+  .edit-layout{grid-template-columns:1fr}
+  .edit-preview{position:static}
+}
+@media(max-width:560px){
+  .edit-form{grid-template-columns:1fr}
+}

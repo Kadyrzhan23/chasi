@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
-import { clients, Client, demand, DISCOUNT_PIN, giftSets, GIFT_BOX, interests, OnlineOrder, PAYMENT_LABEL, products, Sale, salesMock, serviceDue, tradeIns, views7d, dailyVisits } from '../data/mock'
+import { useNavigate } from 'react-router-dom'
+import { clients, Client, demand, DISCOUNT_OPTIONS, DISCOUNT_PIN, giftSets, GIFT_BOX, interests, OnlineOrder, PAYMENT_LABEL, products, Sale, salesMock, serviceDue, tradeIns, views7d, dailyVisits } from '../data/mock'
 import { updateOrderStatus, useOrders } from '../store/orders'
+import { effectivePrice, isLowStock, setDiscount, setStock, useProducts } from '../store/products'
 import { toast } from '../toast'
 
-type Tab = 'dash' | 'weborders' | 'neworder' | 'sales' | 'interest' | 'demand' | 'tradein' | 'service' | 'clients'
+type Tab = 'dash' | 'products' | 'weborders' | 'neworder' | 'sales' | 'interest' | 'demand' | 'tradein' | 'service' | 'clients'
 
 type Prefill = { productId: number; clientId: number; orderId?: string }
 
@@ -37,6 +39,7 @@ function NewOrder({ onCreate, clientList, prefill, onProcessed }: {
   prefill: Prefill | null
   onProcessed: (orderId: string) => void
 }) {
+  const shopProducts = useProducts()
   const [clientId, setClientId] = useState('')
   const [productId, setProductId] = useState('')
   const [pin, setPin] = useState('')
@@ -51,7 +54,7 @@ function NewOrder({ onCreate, clientList, prefill, onProcessed }: {
     }
   }, [prefill])
 
-  const p = products.find(x => x.id === +productId)
+  const p = shopProducts.find(x => x.id === +productId)
   const total = p ? Math.round(p.price * (1 - discount / 100)) : 0
 
   const checkPin = () => {
@@ -99,7 +102,7 @@ function NewOrder({ onCreate, clientList, prefill, onProcessed }: {
           <label style={lbl}>1 · Модель из магазина</label>
           <select className="select" style={{ width: '100%' }} value={productId} onChange={e => setProductId(e.target.value)}>
             <option value="">— выберите часы —</option>
-            {products.filter(x => x.inStock).map(x => (
+            {shopProducts.filter(x => x.inStock).map(x => (
               <option key={x.id} value={x.id}>{x.brand} · {x.name} — {money(x.price)}</option>
             ))}
           </select>
@@ -210,6 +213,106 @@ function SalesReport({ sales, clientList }: { sales: Sale[]; clientList: Client[
             })}
           </tbody>
         </table>
+      )}
+    </>
+  )
+}
+
+/* ---------- Управление товарами ---------- */
+type PFilter = 'all' | 'in' | 'order' | 'sale' | 'low'
+const PFILTER_LABEL: Record<PFilter, string> = {
+  all: 'Все', in: 'В наличии', order: 'Под заказ', sale: 'Со скидкой', low: 'Мало осталось',
+}
+
+function ProductsAdmin() {
+  const navigate = useNavigate()
+  const list = useProducts()
+  const [q, setQ] = useState('')
+  const [filter, setFilter] = useState<PFilter>('all')
+
+  const rows = useMemo(() => list.filter(p => {
+    if (q && !(p.name + ' ' + p.brand).toLowerCase().includes(q.toLowerCase())) return false
+    if (filter === 'in' && !p.inStock) return false
+    if (filter === 'order' && p.inStock) return false
+    if (filter === 'sale' && p.discount === 0) return false
+    if (filter === 'low' && !isLowStock(p)) return false
+    return true
+  }), [list, q, filter])
+
+  const lowCount = list.filter(isLowStock).length
+  const saleCount = list.filter(p => p.discount > 0).length
+
+  return (
+    <>
+      <span className="sec-label">CRM · склад</span>
+      <h2 style={{ marginBottom: 8 }}>Продукты</h2>
+      <p className="muted" style={{ fontSize: '.82rem', marginBottom: 22, fontWeight: 300 }}>
+        Все товары из базы магазина. Меняйте статус наличия, остаток и скидку — изменения сразу
+        видны клиентам на сайте. Мало осталось: <b style={{ color: 'var(--gold2)' }}>{lowCount}</b> ·
+        со скидкой: <b style={{ color: 'var(--gold2)' }}>{saleCount}</b>.
+      </p>
+
+      <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginBottom: 22, flexWrap: 'wrap' }}>
+        <input className="search-inp" style={{ marginBottom: 0, maxWidth: 280 }} placeholder="Поиск: модель или бренд…" value={q} onChange={e => setQ(e.target.value)} />
+        <div className="chips">
+          {(Object.keys(PFILTER_LABEL) as PFilter[]).map(f => (
+            <button key={f} className={`chip ${filter === f ? 'on' : ''}`} onClick={() => setFilter(f)}>{PFILTER_LABEL[f]}</button>
+          ))}
+        </div>
+        <span className="muted" style={{ fontSize: '.72rem' }}>найдено: {rows.length}</span>
+      </div>
+
+      {rows.length === 0 ? (
+        <div className="empty">Ничего не найдено по этому фильтру.</div>
+      ) : (
+        <div className="prod-admin">
+          {rows.map(p => (
+            <div className="prow" key={p.id}>
+              <div className="prow-name">
+                <b>{p.name}</b>
+                <div className="muted" style={{ fontSize: '.72rem' }}>{p.brand} · ⌀{p.diameter}мм</div>
+                <div className="prow-price">
+                  {p.discount > 0
+                    ? <><s className="muted" style={{ fontSize: '.8rem', marginRight: 8 }}>{money(p.price)}</s><b style={{ color: 'var(--gold2)' }}>{money(effectivePrice(p))}</b></>
+                    : money(p.price)}
+                </div>
+                <button className="btn btn-ghost btn-sm" style={{ marginTop: 10 }} onClick={() => navigate(`/admin/product/${p.id}`)}>✎ Изменить</button>
+              </div>
+
+              <div className="prow-ctrl">
+                <div className="prow-label">Статус</div>
+                <div>
+                  {p.stock === 0
+                    ? <span className="pill r">под заказ</span>
+                    : isLowStock(p)
+                      ? <span className="pill y">осталось {p.stock}</span>
+                      : <span className="pill g">в наличии</span>}
+                  <div className="muted" style={{ fontSize: '.66rem', marginTop: 6 }}>по остатку</div>
+                </div>
+              </div>
+
+              <div className="prow-ctrl">
+                <div className="prow-label">Остаток</div>
+                <div className="stepper">
+                  <button onClick={() => setStock(p.id, p.stock - 1)} disabled={p.stock <= 0}>−</button>
+                  <span>{p.stock} шт.</span>
+                  <button onClick={() => setStock(p.id, p.stock + 1)}>+</button>
+                </div>
+              </div>
+
+              <div className="prow-ctrl">
+                <div className="prow-label">Скидка</div>
+                <div className="chips">
+                  {DISCOUNT_OPTIONS.map(d => (
+                    <button key={d} className={`chip ${p.discount === d ? 'on' : ''}`} onClick={() => setDiscount(p.id, d)}>
+                      {d === 0 ? 'Нет' : `−${d}%`}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       )}
     </>
   )
@@ -333,6 +436,7 @@ export default function Admin() {
     <div className="admin">
       <aside className="admin-side">
         <button className={tab === 'dash' ? 'on' : ''} onClick={() => setTab('dash')}>▦ Дашборд · 7 дней</button>
+        <button className={tab === 'products' ? 'on' : ''} onClick={() => setTab('products')}>▧ Продукты · склад</button>
         <button className={tab === 'weborders' ? 'on' : ''} onClick={() => setTab('weborders')}>
           🛒 Заказы с сайта {newOrdersCount > 0 && <span className="side-badge">{newOrdersCount}</span>}
         </button>
@@ -370,6 +474,8 @@ export default function Admin() {
             </div>
           </>
         )}
+
+        {tab === 'products' && <ProductsAdmin />}
 
         {tab === 'weborders' && (
           <WebOrders orders={webOrders} onProcess={processOrder} />

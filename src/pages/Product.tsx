@@ -1,12 +1,14 @@
-import { useMemo } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import WatchVisual from '../components/WatchVisual'
-import { CATEGORY_LABEL, products, STYLE_LABEL } from '../data/mock'
+import { CATEGORY_LABEL, STYLE_LABEL } from '../data/mock'
 import { useAuth } from '../App'
 import { useCart } from '../store/cart'
+import { effectivePrice, isLastOne, isLowStock, useProducts } from '../store/products'
+import { productTags, relatedProducts } from '../store/tags'
 import { toast } from '../toast'
 
 const GENDER_LABEL: Record<string, string> = { 'муж': 'Мужские', 'жен': 'Женские', 'унисекс': 'Унисекс' }
+const money = (n: number) => n.toLocaleString('ru-RU') + ' $'
 
 export default function Product() {
   const { id } = useParams()
@@ -14,7 +16,8 @@ export default function Product() {
   const { authed } = useAuth()
   const { add, items } = useCart()
 
-  const product = useMemo(() => products.find(p => p.id === Number(id)), [id])
+  const shopProducts = useProducts()
+  const product = shopProducts.find(p => p.id === Number(id))
   const inCart = product ? items.find(i => i.productId === product.id)?.qty ?? 0 : 0
 
   if (!product) {
@@ -29,6 +32,12 @@ export default function Product() {
   }
 
   const p = product
+  const price = effectivePrice(p)
+  const hasDiscount = p.discount > 0
+  const low = isLowStock(p)
+  const last = isLastOne(p)
+  const tags = productTags(p)
+  const related = relatedProducts(p, shopProducts)
 
   // 6–8 ключевых характеристик
   const specs: [string, string][] = [
@@ -72,14 +81,22 @@ export default function Product() {
           <div className="product-tags">
             <span className={`tag ${p.category === 'original' ? 'orig' : 'copy'}`}>{CATEGORY_LABEL[p.category]}</span>
             {p.inStock ? <span className="pill g">в наличии</span> : <span className="pill r">под заказ</span>}
+            {hasDiscount && <span className="pill y">−{p.discount}%</span>}
+            {low && <span className="pill r">осталось {p.stock}</span>}
           </div>
         </div>
 
         <div className="product-info">
           <span className="sec-label">{p.brand}</span>
           <h1 className="big" style={{ fontSize: 'clamp(2rem,3.6vw,3.2rem)', marginBottom: 6 }}>{p.name}</h1>
-          <div className="muted" style={{ fontSize: '.82rem', letterSpacing: '.06em', marginBottom: 24 }}>
+          <div className="muted" style={{ fontSize: '.82rem', letterSpacing: '.06em', marginBottom: 18 }}>
             {STYLE_LABEL[p.style]} · ⌀{p.diameter} мм · {GENDER_LABEL[p.gender] ?? p.gender}
+          </div>
+
+          <div className="tagrow">
+            {tags.map(t => (
+              <Link key={t.label} to={t.to} className="tagchip">{t.label}</Link>
+            ))}
           </div>
 
           <h4 className="spec-h">Характеристики</h4>
@@ -92,9 +109,21 @@ export default function Product() {
           </table>
 
           <div className={`price ${authed ? '' : 'locked'}`} style={{ fontSize: '2rem', marginTop: 10 }}>
-            {p.price.toLocaleString('ru-RU')} $
+            {hasDiscount
+              ? <>
+                  <s className="muted" style={{ fontSize: '1.2rem', marginRight: 12 }}>{money(p.price)}</s>
+                  {money(price)}
+                  <span className="save-pill">выгода {money(p.price - price)}</span>
+                </>
+              : money(p.price)}
           </div>
           <div className="lock-note" style={{ marginBottom: 22 }}>🔒 Войдите, чтобы увидеть цену</div>
+
+          {p.inStock && low && (
+            <div className="urgency">
+              🔥 {last ? 'Последний экземпляр!' : `Осталось всего ${p.stock} шт.`} Торопитесь — модель почти разобрали.
+            </div>
+          )}
 
           <div className="product-actions">
             <button className="btn btn-gold" onClick={addToCart}>
@@ -111,6 +140,37 @@ export default function Product() {
           </div>
         </div>
       </div>
+
+      {related.length > 0 && (
+        <section style={{ padding: '10px 4vw 70px' }}>
+          <div className="sec-head" style={{ marginBottom: 28 }}>
+            <div><span className="sec-label">Вам подойдёт</span><h2 style={{ fontSize: 'clamp(1.6rem,3vw,2.2rem)' }}>Похожие модели</h2></div>
+            <Link to={`/catalog?brand=${encodeURIComponent(p.brand)}`} className="btn btn-ghost btn-sm">Все {p.brand} →</Link>
+          </div>
+          <div className="grid4">
+            {related.map(r => (
+              <div key={r.id} className="card" onClick={() => navigate(`/product/${r.id}`)}>
+                <div className="card-corner right">
+                  {!r.inStock
+                    ? <span className="cbadge stock-order">под заказ</span>
+                    : isLowStock(r)
+                      ? <span className="cbadge stock-low">осталось {r.stock}</span>
+                      : <span className="cbadge stock-ok">в наличии</span>}
+                </div>
+                <div className="w"><WatchVisual product={r} /></div>
+                <h3>{r.name}</h3>
+                <div className="cat">{r.brand} · {STYLE_LABEL[r.style]}</div>
+                <div className={`price ${authed ? '' : 'locked'}`} style={{ marginTop: 12 }}>
+                  {r.discount > 0
+                    ? <><s className="muted" style={{ fontSize: '.85rem', marginRight: 8 }}>{money(r.price)}</s>{money(effectivePrice(r))}</>
+                    : money(r.price)}
+                </div>
+                <div className="lock-note">🔒 Войдите, чтобы увидеть цену</div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
     </>
   )
 }

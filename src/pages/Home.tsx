@@ -2,16 +2,16 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import WatchSVG from '../components/WatchSVG'
 import WatchVisual from '../components/WatchVisual'
-import { products } from '../data/mock'
 import { toast } from '../toast'
 import { useAuth, useTheme } from '../App'
+import { effectivePrice, isLowStock, useProducts } from '../store/products'
 
 const HERO_PHOTO: Record<string, string> = {
   onyx: 'https://images.unsplash.com/photo-1547996160-81dfa63595aa?auto=format&fit=crop&w=1000&q=80',
 }
 const FOUNDER_PHOTO = 'https://images.unsplash.com/photo-1434056886845-dac89ffe9b56?auto=format&fit=crop&w=900&q=80'
 
-const featured = products.filter(p => [1, 2, 3, 7].includes(p.id))
+const FEATURED_IDS = [1, 2, 3, 7]
 const brandsRow = ['ROLEX', 'AUDEMARS PIGUET', 'PATEK PHILIPPE', 'TISSOT', 'LONGINES', 'FRÉDÉRIQUE CONSTANT', 'ALPINA', 'ORIENT']
 
 /* плавное появление секций */
@@ -53,6 +53,8 @@ export default function Home() {
   const navigate = useNavigate()
   const { authed } = useAuth()
   const { theme } = useTheme()
+  const shopProducts = useProducts()
+  const featured = shopProducts.filter(p => FEATURED_IDS.includes(p.id))
   const [wl, setWl] = useState(37)
   const [wlInput, setWlInput] = useState('')
 
@@ -94,11 +96,25 @@ export default function Home() {
         <div className="grid4">
           {featured.map((p, i) => (
             <div key={p.id} className="card reveal" style={{ transitionDelay: `${i * 0.1}s` }} onClick={() => openProduct(p.id)}>
-              {!p.inStock && <div className="badge red">под заказ</div>}
+              <div className="card-corner left">
+                <span className={`cbadge ${p.category === 'original' ? 'orig' : 'copy'}`}>{p.category === 'original' ? 'Оригинал' : '1:1 клон'}</span>
+                {p.discount > 0 && <span className="cbadge gold">−{p.discount}%</span>}
+              </div>
+              <div className="card-corner right">
+                {!p.inStock
+                  ? <span className="cbadge stock-order">под заказ</span>
+                  : isLowStock(p)
+                    ? <span className="cbadge stock-low">осталось {p.stock}</span>
+                    : <span className="cbadge stock-ok">в наличии</span>}
+              </div>
               <div className="w"><WatchVisual product={p} /></div>
               <h3>{p.name}</h3>
-              <div className="cat">{p.style === 'diver' ? 'Дайверские' : p.style === 'dress' ? 'Классика' : 'Спорт'} · Оригинал</div>
-              <div className={`price ${authed ? '' : 'locked'}`}>{p.price.toLocaleString('ru-RU')} $</div>
+              <div className="cat">{p.style === 'diver' ? 'Дайверские' : p.style === 'dress' ? 'Классика' : 'Спорт'}</div>
+              <div className={`price ${authed ? '' : 'locked'}`} style={{ marginTop: 12 }}>
+                {p.discount > 0
+                  ? <><s className="muted" style={{ fontSize: '.85rem', marginRight: 8 }}>{p.price.toLocaleString('ru-RU')} $</s>{effectivePrice(p).toLocaleString('ru-RU')} $</>
+                  : <>{p.price.toLocaleString('ru-RU')} $</>}
+              </div>
               <div className="lock-note">🔒 Войдите, чтобы увидеть цену</div>
               <div className="card-cta muted">Открыть карточку →</div>
             </div>

@@ -2,20 +2,22 @@ import { useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import WatchVisual from '../components/WatchVisual'
 import {
-  giftSets, GIFT_BOX, OnlineOrder, PaymentMethod, PAYMENT_LABEL, products,
+  giftSets, GIFT_BOX, OnlineOrder, PaymentMethod, PAYMENT_LABEL,
 } from '../data/mock'
 import { useAuth } from '../App'
 import { useCart } from '../store/cart'
+import { effectivePrice, useProducts } from '../store/products'
 import { addOrder, makeOrderId } from '../store/orders'
 import { toast } from '../toast'
 
 const money = (n: number) => n.toLocaleString('ru-RU') + ' $'
-const prod = (id: number) => products.find(p => p.id === id)!
 
 export default function Cart() {
   const navigate = useNavigate()
   const { authed, toggle } = useAuth()
   const { items, setQty, remove, clear, giftSetId, setGiftSetId } = useCart()
+  const shopProducts = useProducts()
+  const prod = (id: number) => shopProducts.find(p => p.id === id)!
 
   const [giftBox, setGiftBox] = useState(false)
   const [payment, setPayment] = useState<PaymentMethod>('payme')
@@ -27,7 +29,7 @@ export default function Cart() {
 
   const giftSet = giftSets.find(g => g.id === giftSetId) ?? null
 
-  const itemsTotal = useMemo(() => items.reduce((a, i) => a + prod(i.productId).price * i.qty, 0), [items])
+  const itemsTotal = useMemo(() => items.reduce((a, i) => a + effectivePrice(prod(i.productId)) * i.qty, 0), [items, shopProducts])
   const extrasTotal = (giftBox ? GIFT_BOX.price : 0) + (giftSet ? giftSet.price : 0)
   const total = itemsTotal + extrasTotal
 
@@ -129,7 +131,7 @@ export default function Cart() {
                 <div className="cart-thumb"><WatchVisual product={p} /></div>
                 <div className="cart-row-info">
                   <h3>{p.name}</h3>
-                  <div className="cat">{p.brand} · ⌀{p.diameter}мм</div>
+                  <div className="cat">{p.brand} · ⌀{p.diameter}мм{p.discount > 0 && <span className="pill y" style={{ marginLeft: 8 }}>−{p.discount}%</span>}</div>
                   <button className="link-del" onClick={() => remove(i.productId)}>Удалить</button>
                 </div>
                 <div className="qty">
@@ -137,7 +139,10 @@ export default function Cart() {
                   <span>{i.qty}</span>
                   <button onClick={() => setQty(i.productId, i.qty + 1)}>+</button>
                 </div>
-                <div className="cart-price">{money(p.price * i.qty)}</div>
+                <div className="cart-price">
+                  {p.discount > 0 && <s className="muted" style={{ display: 'block', fontSize: '.8rem' }}>{money(p.price * i.qty)}</s>}
+                  {money(effectivePrice(p) * i.qty)}
+                </div>
               </div>
             )
           })}
