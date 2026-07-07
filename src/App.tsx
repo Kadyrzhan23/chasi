@@ -7,6 +7,7 @@ import GiftSets from './pages/GiftSets'
 import Cart from './pages/Cart'
 import Account from './pages/Account'
 import Admin from './pages/Admin'
+import ProductEdit from './pages/ProductEdit'
 import Passport from './pages/Passport'
 import { CartProvider, useCart } from './store/cart'
 import { onToast, toast, ToastMsg } from './toast'
@@ -178,6 +179,7 @@ export default function App() {
               <Route path="/cart" element={<Cart />} />
               <Route path="/account" element={<Account />} />
               <Route path="/admin" element={<Admin />} />
+              <Route path="/admin/product/:id" element={<ProductEdit />} />
               <Route path="/passport/:serial" element={<Passport />} />
             </Routes>
             <Footer />
