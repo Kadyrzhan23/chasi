@@ -1,8 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
-import { clients, demand, DISCOUNT_PIN, interests, products, Sale, salesMock, serviceDue, tradeIns, views7d, dailyVisits } from '../data/mock'
+import { clients, Client, demand, DISCOUNT_PIN, giftSets, GIFT_BOX, interests, OnlineOrder, PAYMENT_LABEL, products, Sale, salesMock, serviceDue, tradeIns, views7d, dailyVisits } from '../data/mock'
+import { updateOrderStatus, useOrders } from '../store/orders'
 import { toast } from '../toast'
 
-type Tab = 'dash' | 'neworder' | 'sales' | 'interest' | 'demand' | 'tradein' | 'service' | 'clients'
+type Tab = 'dash' | 'weborders' | 'neworder' | 'sales' | 'interest' | 'demand' | 'tradein' | 'service' | 'clients'
+
+type Prefill = { productId: number; clientId: number; orderId?: string }
 
 const DEMO_TODAY = '2026-07-03'
 const money = (n: number) => n.toLocaleString('ru-RU') + ' $'
@@ -28,12 +31,25 @@ function Bars({ rows }: { rows: { name: string; value: number }[] }) {
 }
 
 /* ---------- Новый заказ ---------- */
-function NewOrder({ onCreate }: { onCreate: (s: Sale) => void }) {
+function NewOrder({ onCreate, clientList, prefill, onProcessed }: {
+  onCreate: (s: Sale) => void
+  clientList: Client[]
+  prefill: Prefill | null
+  onProcessed: (orderId: string) => void
+}) {
   const [clientId, setClientId] = useState('')
   const [productId, setProductId] = useState('')
   const [pin, setPin] = useState('')
   const [pinOk, setPinOk] = useState(false)
   const [discount, setDiscount] = useState(0)
+
+  // автозаполнение при переходе с заказа с сайта
+  useEffect(() => {
+    if (prefill) {
+      setProductId(String(prefill.productId))
+      setClientId(String(prefill.clientId))
+    }
+  }, [prefill])
 
   const p = products.find(x => x.id === +productId)
   const total = p ? Math.round(p.price * (1 - discount / 100)) : 0
@@ -55,11 +71,12 @@ function NewOrder({ onCreate }: { onCreate: (s: Sale) => void }) {
       time: new Date().toTimeString().slice(0, 5),
       productId: p.id, clientId: +clientId, discountPct: discount,
     })
-    const c = clients.find(x => x.id === +clientId)!
+    const c = clientList.find(x => x.id === +clientId)!
     toast({
       title: 'Заказ оформлен ✦',
       text: `${c.name.split(' ')[0]}, спасибо за покупку! ${p.name} — ${money(total)}${discount ? ` (скидка −${discount}%)` : ''}. Цифровой паспорт часов уже в вашем кабинете. — так клиент получит чек в Telegram.`,
     })
+    if (prefill?.orderId) onProcessed(prefill.orderId)
     setClientId(''); setProductId(''); setDiscount(0); setPin(''); setPinOk(false)
   }
 
@@ -72,6 +89,11 @@ function NewOrder({ onCreate }: { onCreate: (s: Sale) => void }) {
       <p className="muted" style={{ fontSize: '.82rem', marginBottom: 26, fontWeight: 300 }}>
         Один заказ — одни часы. Выберите модель, прикрепите клиента; скидка проводится только после PIN-кода владельца.
       </p>
+      {prefill?.orderId && (
+        <div className="prefill-note">
+          ✦ Форма заполнена из заказа с сайта <b>{prefill.orderId}</b>. Проверьте данные и оформите продажу — заказ отметится как «оформлен».
+        </div>
+      )}
       <div className="panel" style={{ maxWidth: 640 }}>
         <div style={{ marginBottom: 20 }}>
           <label style={lbl}>1 · Модель из магазина</label>
@@ -86,7 +108,7 @@ function NewOrder({ onCreate }: { onCreate: (s: Sale) => void }) {
           <label style={lbl}>2 · Аккаунт клиента</label>
           <select className="select" style={{ width: '100%' }} value={clientId} onChange={e => setClientId(e.target.value)}>
             <option value="">— выберите клиента —</option>
-            {clients.map(c => <option key={c.id} value={c.id}>{c.name} · {c.phone} · {c.level}</option>)}
+            {clientList.map(c => <option key={c.id} value={c.id}>{c.name} · {c.phone} · {c.level}</option>)}
           </select>
         </div>
         <div style={{ marginBottom: 20 }}>
@@ -127,7 +149,7 @@ function NewOrder({ onCreate }: { onCreate: (s: Sale) => void }) {
 }
 
 /* ---------- Продажи за день / месяц ---------- */
-function SalesReport({ sales }: { sales: Sale[] }) {
+function SalesReport({ sales, clientList }: { sales: Sale[]; clientList: Client[] }) {
   const [mode, setMode] = useState<'day' | 'month'>('day')
   const [day, setDay] = useState(DEMO_TODAY)
   const [month, setMonth] = useState(DEMO_TODAY.slice(0, 7))
@@ -174,12 +196,12 @@ function SalesReport({ sales }: { sales: Sale[] }) {
           <thead><tr><th>Дата · время</th><th>Товар</th><th>Клиент</th><th>Цена</th><th>Скидка</th><th>Итог</th></tr></thead>
           <tbody>
             {withTotals.map(s => {
-              const c = clients.find(x => x.id === s.clientId)!
+              const c = clientList.find(x => x.id === s.clientId)
               return (
                 <tr key={s.id}>
                   <td className="muted">{s.date.split('-').reverse().join('.')} · {s.time}</td>
                   <td>{s.p.brand} {s.p.name}</td>
-                  <td>{c.name}</td>
+                  <td>{c ? c.name : '—'}</td>
                   <td>{money(s.price)}</td>
                   <td>{s.discountPct > 0 ? <span className="pill y">−{s.discountPct}%</span> : <span className="muted">—</span>}</td>
                   <td style={{ color: 'var(--gold2)' }}>{money(s.total)}</td>
@@ -193,11 +215,101 @@ function SalesReport({ sales }: { sales: Sale[] }) {
   )
 }
 
+/* ---------- Заказы с сайта ---------- */
+function WebOrders({ orders, onProcess }: { orders: OnlineOrder[]; onProcess: (o: OnlineOrder) => void }) {
+  const fmt = (iso: string) => {
+    const d = new Date(iso)
+    return `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}.${d.getFullYear()} · ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`
+  }
+  return (
+    <>
+      <span className="sec-label">CRM · онлайн-канал</span>
+      <h2 style={{ marginBottom: 8 }}>Заказы с сайта</h2>
+      <p className="muted" style={{ fontSize: '.82rem', marginBottom: 26, fontWeight: 300 }}>
+        Заявки, оформленные клиентами на сайте. Нажмите «Оформить в кассе» — откроется форма нового заказа
+        с уже заполненными клиентом и моделью. Осталось подтвердить и провести продажу.
+      </p>
+
+      {orders.length === 0 ? (
+        <div className="empty">Пока нет заказов с сайта. Оформите заказ в корзине — он появится здесь.</div>
+      ) : (
+        <div className="weborders">
+          {orders.map(o => {
+            const gs = giftSets.find(g => g.id === o.giftSetId)
+            return (
+              <div className={`panel weborder ${o.status === 'новый' ? 'is-new' : ''}`} key={o.id}>
+                <div className="weborder-top">
+                  <div>
+                    <b style={{ color: 'var(--gold2)', fontSize: '1.05rem' }}>Заказ {o.id}</b>
+                    <div className="muted" style={{ fontSize: '.72rem', marginTop: 4 }}>{fmt(o.createdAt)}</div>
+                  </div>
+                  {o.status === 'новый'
+                    ? <span className="pill y">новый</span>
+                    : <span className="pill g">оформлен ✓</span>}
+                </div>
+
+                <div className="weborder-body">
+                  <div>
+                    <div className="wo-label">Клиент</div>
+                    <div>{o.customer.name}</div>
+                    <div className="muted" style={{ fontSize: '.76rem' }}>{o.customer.phone}</div>
+                    {o.customer.address && <div className="muted" style={{ fontSize: '.76rem' }}>{o.customer.address}</div>}
+                    {o.customer.comment && <div className="muted" style={{ fontSize: '.72rem', marginTop: 4 }}>💬 {o.customer.comment}</div>}
+                  </div>
+                  <div>
+                    <div className="wo-label">Состав</div>
+                    {o.items.map(i => (
+                      <div key={i.productId}>{prod(i.productId).brand} {prod(i.productId).name} × {i.qty}</div>
+                    ))}
+                    {o.giftBox && <div className="muted" style={{ fontSize: '.78rem' }}>+ {GIFT_BOX.title}</div>}
+                    {gs && <div className="muted" style={{ fontSize: '.78rem' }}>+ Набор «{gs.name}»</div>}
+                  </div>
+                  <div>
+                    <div className="wo-label">Оплата</div>
+                    <div>{PAYMENT_LABEL[o.payment]}</div>
+                    <div className="wo-label" style={{ marginTop: 12 }}>Сумма</div>
+                    <div style={{ fontFamily: 'var(--serif)', fontSize: '1.5rem', color: 'var(--gold2)' }}>{money(o.total)}</div>
+                  </div>
+                </div>
+
+                <div className="weborder-foot">
+                  {o.status === 'новый'
+                    ? <button className="btn btn-gold btn-sm" onClick={() => onProcess(o)}>Оформить в кассе →</button>
+                    : <span className="muted" style={{ fontSize: '.76rem' }}>Проведён через кассу</span>}
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      )}
+    </>
+  )
+}
+
+const digits = (s: string) => s.replace(/\D/g, '')
+
 export default function Admin() {
   const [tab, setTab] = useState<Tab>('dash')
   const [sentDiscount, setSentDiscount] = useState<number[]>([])
   const [reminded, setReminded] = useState<number[]>([])
   const [sales, setSales] = useState<Sale[]>(salesMock)
+
+  const webOrders = useOrders()
+  const [extraClients, setExtraClients] = useState<Client[]>([])
+  const [prefill, setPrefill] = useState<Prefill | null>(null)
+  const allClients = useMemo(() => [...clients, ...extraClients], [extraClients])
+  const newOrdersCount = webOrders.filter(o => o.status === 'новый').length
+
+  // Клик по заказу с сайта → заполняем форму «Новый заказ»
+  const processOrder = (order: OnlineOrder) => {
+    let c = allClients.find(x => digits(x.phone) === digits(order.customer.phone))
+    if (!c) {
+      c = { id: Date.now(), name: order.customer.name, phone: order.customer.phone, level: 'Silver', points: 0, ltv: 0, lastVisit: 'сегодня' }
+      setExtraClients(prev => [...prev, c!])
+    }
+    setPrefill({ productId: order.items[0].productId, clientId: c.id, orderId: order.id })
+    setTab('neworder')
+  }
 
   const sendDiscount = (idx: number) => {
     const it = interests[idx]
@@ -221,6 +333,9 @@ export default function Admin() {
     <div className="admin">
       <aside className="admin-side">
         <button className={tab === 'dash' ? 'on' : ''} onClick={() => setTab('dash')}>▦ Дашборд · 7 дней</button>
+        <button className={tab === 'weborders' ? 'on' : ''} onClick={() => setTab('weborders')}>
+          🛒 Заказы с сайта {newOrdersCount > 0 && <span className="side-badge">{newOrdersCount}</span>}
+        </button>
         <button className={tab === 'neworder' ? 'on' : ''} onClick={() => setTab('neworder')}>＋ Новый заказ</button>
         <button className={tab === 'sales' ? 'on' : ''} onClick={() => setTab('sales')}>▤ Продажи</button>
         <button className={tab === 'interest' ? 'on' : ''} onClick={() => setTab('interest')}>♦ Интересы клиентов</button>
@@ -256,11 +371,20 @@ export default function Admin() {
           </>
         )}
 
-        {tab === 'neworder' && (
-          <NewOrder onCreate={s => { setSales(prev => [s, ...prev]); setTab('sales') }} />
+        {tab === 'weborders' && (
+          <WebOrders orders={webOrders} onProcess={processOrder} />
         )}
 
-        {tab === 'sales' && <SalesReport sales={sales} />}
+        {tab === 'neworder' && (
+          <NewOrder
+            onCreate={s => { setSales(prev => [s, ...prev]); setPrefill(null); setTab('sales') }}
+            clientList={allClients}
+            prefill={prefill}
+            onProcessed={id => updateOrderStatus(id, 'оформлен')}
+          />
+        )}
+
+        {tab === 'sales' && <SalesReport sales={sales} clientList={allClients} />}
 
         {tab === 'interest' && (
           <>

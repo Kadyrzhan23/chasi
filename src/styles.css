@@ -362,3 +362,98 @@ footer{border-top:1px solid var(--line);padding:56px 4vw 26px;background:var(--b
   .tbl th,.tbl td{padding:9px 8px}
   h1.big{font-size:2.4rem}
 }
+
+/* ============ КОРЗИНА / ТОВАР / НАБОРЫ / ЗАКАЗЫ (feature/shop-cart) ============ */
+
+/* — иконка корзины в шапке — */
+.cart-link{position:relative;display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;font-size:1.15rem;text-decoration:none;border:1px solid var(--line);border-radius:var(--btnrad);color:var(--gold2);transition:.3s;flex-shrink:0}
+.cart-link:hover,.cart-link.active{border-color:var(--gold);background:var(--wash)}
+.cart-count{position:absolute;top:-6px;right:-6px;min-width:18px;height:18px;padding:0 5px;border-radius:20px;background:var(--gold);color:var(--ongold);font-size:.64rem;font-weight:700;display:flex;align-items:center;justify-content:center;line-height:1}
+
+/* — карточка каталога: подсказка — */
+.card-cta{font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;margin-top:14px;opacity:.6;transition:.3s}
+.card:hover .card-cta{opacity:1;color:var(--gold2)}
+
+/* — страница товара — */
+.crumbs{font-size:.72rem;letter-spacing:.08em;color:var(--muted)}
+.crumbs a{color:var(--muted);text-decoration:none}
+.crumbs a:hover{color:var(--gold2)}
+.crumbs span{margin:0 8px;opacity:.5}
+.crumbs b{color:var(--gold2);font-weight:500}
+.product{display:grid;grid-template-columns:1fr 1.05fr;gap:48px;padding:24px 4vw 70px;align-items:start}
+.product-media{position:sticky;top:96px;border-radius:var(--rad);background:radial-gradient(circle at 45% 35%,rgba(212,175,106,.09),transparent 62%);border:1px solid var(--line2);padding:44px;display:flex;flex-direction:column;align-items:center;gap:22px}
+.product-media svg{width:min(30vw,320px)}
+.product-media .wimg{width:min(30vw,320px);aspect-ratio:3/4}
+.product-tags{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.spec-h{font-size:.7rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);margin-bottom:2px}
+.product-actions{display:flex;gap:12px;flex-wrap:wrap}
+.product-note{font-size:.8rem;line-height:1.7;font-weight:300;margin-top:22px;border-top:1px solid var(--line2);padding-top:18px}
+
+/* — подарочные наборы — */
+.gift-card{border-radius:var(--rad);background:var(--panel);border:1px solid var(--line2);padding:26px 24px;position:relative;transition:.4s;display:flex;flex-direction:column}
+.gift-card:hover{border-color:var(--line);transform:translateY(-6px);box-shadow:var(--shadow)}
+.gift-card.on{border-color:var(--gold)}
+.gift-card h3{font-size:1.2rem;margin-bottom:4px}
+.gift-card .cat{color:var(--muted);font-size:.72rem;letter-spacing:.08em;margin-bottom:16px}
+.gift-swatch{width:100%;aspect-ratio:16/9;border-radius:var(--imgrad);border:1px solid;display:flex;align-items:center;justify-content:center;font-size:2rem;margin-bottom:18px}
+.gift-items{list-style:none;margin:0 0 18px;padding:0}
+.gift-items li{font-size:.82rem;font-weight:300;padding:7px 0;border-bottom:1px solid var(--line2);color:var(--text)}
+.gift-items li::before{content:'✦ ';color:var(--gold)}
+
+/* — корзина / оформление — */
+.cart{display:grid;grid-template-columns:1.5fr 1fr;gap:32px;padding:20px 4vw 70px;align-items:start}
+.cart-main{display:flex;flex-direction:column;gap:14px}
+.cart-row{display:grid;grid-template-columns:auto 1fr auto auto;gap:18px;align-items:center;border:1px solid var(--line2);border-radius:var(--rad);background:var(--panel);padding:16px 20px}
+.cart-thumb{width:70px;display:flex;justify-content:center}
+.cart-thumb svg{width:70px}
+.cart-thumb .wimg{width:70px;height:70px}
+.cart-row-info h3{font-size:1.02rem;margin-bottom:2px}
+.cart-row-info .cat{color:var(--muted);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px}
+.link-del{background:none;border:none;color:var(--muted);font-size:.74rem;cursor:pointer;padding:0;text-decoration:underline;transition:.2s}
+.link-del:hover{color:var(--red)}
+.qty{display:flex;align-items:center;gap:12px}
+.qty button{width:30px;height:30px;border:1px solid var(--line);background:transparent;color:var(--gold2);font-size:1.1rem;cursor:pointer;border-radius:var(--btnrad);transition:.2s;line-height:1}
+.qty button:hover{border-color:var(--gold);background:var(--wash)}
+.qty span{min-width:20px;text-align:center;font-size:.95rem}
+.cart-price{font-family:var(--serif);font-size:1.2rem;color:var(--gold2);white-space:nowrap}
+.opt-block{border:1px solid var(--line2);border-radius:var(--rad);background:var(--panel);padding:18px 20px}
+.opt-head{display:flex;align-items:center;gap:12px;font-size:.92rem;cursor:pointer}
+.opt-head input{accent-color:var(--gold);width:16px;height:16px;cursor:pointer;flex-shrink:0}
+.opt-desc{font-size:.78rem;line-height:1.6;font-weight:300;margin-top:8px;padding-left:28px}
+.giftset-chosen{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-top:12px;padding:12px 16px;border:1px dashed var(--gold);border-radius:var(--rad);background:rgba(212,175,106,.05)}
+.cart-side{display:flex;flex-direction:column;gap:18px;position:sticky;top:96px}
+.pay-opt{display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid var(--line2);border-radius:var(--rad);cursor:pointer;margin-bottom:10px;transition:.25s}
+.pay-opt:last-child{margin-bottom:0}
+.pay-opt:hover{border-color:var(--soft)}
+.pay-opt.on{border-color:var(--gold);background:rgba(212,175,106,.05)}
+.pay-opt input{accent-color:var(--gold);width:16px;height:16px}
+.pay-opt .pay-hint{margin-left:auto;font-size:.7rem}
+.summary .sum-row{display:flex;justify-content:space-between;font-size:.86rem;padding:8px 0;font-weight:300;color:var(--text)}
+.summary .sum-row.total{border-top:1px solid var(--line);margin-top:6px;padding-top:14px;font-size:1.05rem;font-weight:500}
+.summary .sum-row.total span:last-child{font-family:var(--serif);font-size:1.5rem;color:var(--gold2)}
+
+/* — CRM: бейдж вкладки + заказы с сайта — */
+.side-badge{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 5px;margin-left:6px;border-radius:20px;background:var(--gold);color:var(--ongold);font-size:.62rem;font-weight:700;line-height:1}
+.prefill-note{border:1px solid var(--gold);background:rgba(212,175,106,.07);border-radius:var(--rad);padding:14px 18px;font-size:.82rem;font-weight:300;line-height:1.6;margin-bottom:22px;color:var(--text)}
+.weborders{display:flex;flex-direction:column;gap:16px}
+.weborder{margin-bottom:0;transition:.3s}
+.weborder.is-new{border-color:var(--gold)}
+.weborder-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--line2)}
+.weborder-body{display:grid;grid-template-columns:1.2fr 1.3fr .8fr;gap:24px;font-size:.86rem;font-weight:300}
+.weborder-body>div>div{margin-bottom:3px}
+.wo-label{font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:8px}
+.weborder-foot{margin-top:18px;padding-top:16px;border-top:1px solid var(--line2)}
+
+@media(max-width:1000px){
+  .product{grid-template-columns:1fr;gap:28px}
+  .product-media{position:static}
+  .product-media svg,.product-media .wimg{width:min(60vw,280px)}
+  .cart{grid-template-columns:1fr}
+  .cart-side{position:static}
+  .weborder-body{grid-template-columns:1fr}
+}
+@media(max-width:560px){
+  .cart-row{grid-template-columns:auto 1fr;grid-auto-rows:auto}
+  .cart-row .qty{grid-column:1/3;justify-content:flex-start}
+  .cart-price{grid-column:1/3}
+}
