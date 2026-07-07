@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CHASI.UZ — Бутик часов в Ташкенте</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0a0d; --bg2:#101016; --panel:#14141c; --line:rgba(212,175,106,.18);
+  --gold:#d4af6a; --gold2:#f0d9a8; --text:#eae7e0; --muted:#8d8b96;
+  --serif:'Cormorant Garamond',serif; --sans:'Manrope',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);overflow-x:hidden}
+::selection{background:var(--gold);color:#0a0a0d}
+
+/* ---------- preloader ---------- */
+#loader{position:fixed;inset:0;background:var(--bg);z-index:100;display:flex;align-items:center;justify-content:center;transition:opacity .8s,visibility .8s}
+#loader.hide{opacity:0;visibility:hidden}
+#loader .l-logo{font-family:var(--serif);font-size:2rem;letter-spacing:.35em;color:var(--gold);animation:pulse 1.6s ease infinite}
+@keyframes pulse{0%,100%{opacity:.35}50%{opacity:1}}
+
+/* ---------- header ---------- */
+header{position:fixed;top:0;left:0;right:0;z-index:50;padding:22px 5vw;display:flex;align-items:center;justify-content:space-between;transition:.4s}
+header.scrolled{background:rgba(10,10,13,.82);backdrop-filter:blur(14px);border-bottom:1px solid var(--line);padding:14px 5vw}
+.logo{font-family:var(--serif);font-size:1.5rem;letter-spacing:.3em;color:var(--gold2);text-decoration:none}
+.logo span{color:var(--muted);font-size:.9rem}
+nav{display:flex;gap:34px}
+nav a{color:var(--text);text-decoration:none;font-size:.8rem;letter-spacing:.14em;text-transform:uppercase;opacity:.75;transition:.3s;position:relative}
+nav a:hover{opacity:1;color:var(--gold2)}
+nav a::after{content:'';position:absolute;left:0;bottom:-6px;width:0;height:1px;background:var(--gold);transition:.35s}
+nav a:hover::after{width:100%}
+.auth-btn{border:1px solid var(--gold);background:transparent;color:var(--gold);padding:10px 26px;font-family:var(--sans);font-size:.78rem;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;transition:.35s}
+.auth-btn:hover,.auth-btn.on{background:var(--gold);color:#0a0a0d}
+
+/* ---------- hero ---------- */
+.hero{min-height:100vh;display:grid;grid-template-columns:1.1fr .9fr;align-items:center;padding:120px 5vw 60px;position:relative}
+.hero::before{content:'';position:absolute;top:-20%;right:-10%;width:60vw;height:60vw;background:radial-gradient(circle,rgba(212,175,106,.09),transparent 60%);pointer-events:none}
+.hero-tag{display:inline-flex;align-items:center;gap:12px;color:var(--gold);font-size:.75rem;letter-spacing:.3em;text-transform:uppercase;margin-bottom:28px}
+.hero-tag::before{content:'';width:44px;height:1px;background:var(--gold)}
+h1{font-family:var(--serif);font-weight:500;font-size:clamp(3rem,6.2vw,5.6rem);line-height:1.04}
+h1 em{font-style:italic;color:var(--gold2)}
+.hero p{color:var(--muted);max-width:480px;margin:30px 0 44px;line-height:1.8;font-size:1.02rem;font-weight:300}
+.hero-cta{display:flex;gap:18px;flex-wrap:wrap}
+.btn{padding:17px 40px;font-size:.8rem;letter-spacing:.18em;text-transform:uppercase;text-decoration:none;transition:.35s;cursor:pointer;font-family:var(--sans)}
+.btn-gold{background:linear-gradient(135deg,var(--gold),#b8934f);color:#0a0a0d;border:none;font-weight:600}
+.btn-gold:hover{box-shadow:0 12px 40px rgba(212,175,106,.35);transform:translateY(-2px)}
+.btn-ghost{border:1px solid rgba(234,231,224,.25);color:var(--text);background:transparent}
+.btn-ghost:hover{border-color:var(--gold);color:var(--gold2)}
+.hero-watch{display:flex;justify-content:center;position:relative}
+.hero-watch svg{width:min(46vw,520px);filter:drop-shadow(0 40px 80px rgba(0,0,0,.7));animation:floatY 7s ease-in-out infinite}
+@keyframes floatY{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-22px) rotate(1.2deg)}}
+.hero-scroll{position:absolute;bottom:34px;left:5vw;display:flex;align-items:center;gap:14px;color:var(--muted);font-size:.72rem;letter-spacing:.25em;text-transform:uppercase}
+.hero-scroll i{display:block;width:1px;height:52px;background:linear-gradient(var(--gold),transparent);animation:drip 2s ease infinite}
+@keyframes drip{0%{transform:scaleY(0);transform-origin:top}55%{transform:scaleY(1);transform-origin:top}56%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+
+/* ---------- marquee ---------- */
+.marquee{border-block:1px solid var(--line);padding:26px 0;overflow:hidden;background:var(--bg2)}
+.marquee-track{display:flex;gap:80px;width:max-content;animation:scroll 30s linear infinite}
+.marquee-track span{font-family:var(--serif);font-size:1.5rem;letter-spacing:.28em;color:var(--muted);white-space:nowrap;transition:.3s}
+.marquee-track span:hover{color:var(--gold2)}
+.marquee-track b{color:var(--gold);font-weight:400}
+@keyframes scroll{to{transform:translateX(-50%)}}
+
+/* ---------- sections ---------- */
+section{padding:110px 5vw}
+.sec-head{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:60px;gap:24px;flex-wrap:wrap}
+.sec-label{color:var(--gold);font-size:.72rem;letter-spacing:.32em;text-transform:uppercase;margin-bottom:16px;display:block}
+h2{font-family:var(--serif);font-weight:500;font-size:clamp(2rem,3.6vw,3.2rem);line-height:1.1}
+.sec-link{color:var(--gold2);text-decoration:none;font-size:.8rem;letter-spacing:.15em;text-transform:uppercase;border-bottom:1px solid var(--line);padding-bottom:6px;transition:.3s}
+.sec-link:hover{border-color:var(--gold)}
+
+/* reveal animation */
+.reveal{opacity:0;transform:translateY(46px);transition:opacity .9s cubic-bezier(.16,1,.3,1),transform .9s cubic-bezier(.16,1,.3,1)}
+.reveal.visible{opacity:1;transform:none}
+
+/* ---------- products ---------- */
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:26px}
+.card{background:var(--panel);border:1px solid transparent;padding:34px 26px 30px;position:relative;overflow:hidden;cursor:pointer;transition:.45s}
+.card:hover{border-color:var(--line);transform:translateY(-8px);box-shadow:0 30px 60px rgba(0,0,0,.5)}
+.card::after{content:'';position:absolute;top:0;left:-80%;width:50%;height:100%;background:linear-gradient(100deg,transparent,rgba(240,217,168,.06),transparent);transform:skewX(-20deg);transition:.7s}
+.card:hover::after{left:130%}
+.card .w{display:flex;justify-content:center;margin-bottom:26px}
+.card svg{width:150px;transition:.5s}
+.card:hover svg{transform:scale(1.07) rotate(-3deg)}
+.card h3{font-family:var(--serif);font-weight:500;font-size:1.3rem;margin-bottom:6px}
+.card .cat{color:var(--muted);font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;margin-bottom:16px}
+.price{font-size:1.15rem;color:var(--gold2);letter-spacing:.05em;transition:.4s}
+.price.locked{filter:blur(7px);user-select:none}
+.lock-note{font-size:.7rem;color:var(--muted);margin-top:8px;display:flex;gap:6px;align-items:center}
+.lock-note svg{width:11px;height:11px}
+body.authed .price.locked{filter:none}
+body.authed .lock-note{display:none}
+.views-badge{position:absolute;top:14px;right:14px;font-size:.66rem;color:var(--muted);letter-spacing:.1em;border:1px solid var(--line);padding:4px 10px;border-radius:20px;opacity:0;transition:.3s}
+.views-badge.show{opacity:1}
+.disc-badge{position:absolute;top:14px;left:14px;background:var(--gold);color:#0a0a0d;font-size:.68rem;font-weight:700;letter-spacing:.08em;padding:5px 12px;border-radius:20px;opacity:0;transform:scale(.6);transition:.4s cubic-bezier(.34,1.56,.64,1)}
+.disc-badge.show{opacity:1;transform:scale(1)}
+
+/* ---------- waitlist ---------- */
+.waitlist{background:var(--bg2);border-block:1px solid var(--line);text-align:center}
+.waitlist p{color:var(--muted);max-width:560px;margin:22px auto 40px;line-height:1.8;font-weight:300}
+.wl-form{display:flex;gap:0;max-width:520px;margin:0 auto}
+.wl-form input{flex:1;background:transparent;border:1px solid rgba(234,231,224,.2);border-right:none;color:var(--text);padding:17px 22px;font-family:var(--sans);font-size:.9rem;outline:none;transition:.3s}
+.wl-form input:focus{border-color:var(--gold)}
+.wl-count{margin-top:26px;font-size:.78rem;letter-spacing:.15em;text-transform:uppercase;color:var(--gold)}
+.wl-count b{font-size:1.05rem}
+
+/* ---------- stats ---------- */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;text-align:center}
+.stat{padding:50px 20px;border:1px solid var(--line);background:linear-gradient(180deg,rgba(212,175,106,.04),transparent)}
+.stat .num{font-family:var(--serif);font-size:3.4rem;color:var(--gold2)}
+.stat .lbl{color:var(--muted);font-size:.75rem;letter-spacing:.25em;text-transform:uppercase;margin-top:10px}
+
+/* ---------- services ---------- */
+.svc{display:grid;grid-template-columns:repeat(4,1fr);gap:26px}
+.svc-item{padding:40px 30px;border:1px solid var(--line);transition:.4s;position:relative}
+.svc-item:hover{background:var(--panel);transform:translateY(-6px)}
+.svc-item .ico{font-family:var(--serif);font-size:2rem;color:var(--gold);margin-bottom:20px;display:block}
+.svc-item h3{font-family:var(--serif);font-size:1.25rem;font-weight:500;margin-bottom:12px}
+.svc-item p{color:var(--muted);font-size:.85rem;line-height:1.7;font-weight:300}
+
+/* ---------- founder ---------- */
+.founder{display:grid;grid-template-columns:1fr 1fr;gap:70px;align-items:center;background:var(--bg2);border-block:1px solid var(--line)}
+.founder-visual{display:flex;justify-content:center}
+.founder-visual svg{width:min(38vw,380px)}
+.founder blockquote{font-family:var(--serif);font-size:1.6rem;font-style:italic;line-height:1.5;color:var(--gold2);margin-bottom:28px}
+.founder p{color:var(--muted);line-height:1.85;font-weight:300;margin-bottom:18px}
+.sig{font-family:var(--serif);font-size:1.3rem;color:var(--gold);letter-spacing:.1em;margin-top:10px}
+
+/* ---------- footer ---------- */
+footer{border-top:1px solid var(--line);padding:70px 5vw 30px;background:var(--bg2)}
+.foot-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:50px;margin-bottom:56px}
+.foot-grid h4{font-size:.72rem;letter-spacing:.3em;text-transform:uppercase;color:var(--gold);margin-bottom:22px}
+.foot-grid a,.foot-grid li{display:block;color:var(--muted);text-decoration:none;font-size:.88rem;margin-bottom:12px;list-style:none;transition:.3s;font-weight:300}
+.foot-grid a:hover{color:var(--gold2)}
+.foot-bottom{border-top:1px solid var(--line);padding-top:26px;display:flex;justify-content:space-between;color:var(--muted);font-size:.75rem;letter-spacing:.1em;flex-wrap:wrap;gap:10px}
+
+/* ---------- toast ---------- */
+#toast{position:fixed;bottom:34px;right:34px;z-index:90;background:var(--panel);border:1px solid var(--gold);padding:20px 26px;max-width:360px;transform:translateY(140%);transition:.55s cubic-bezier(.16,1,.3,1);box-shadow:0 20px 60px rgba(0,0,0,.6)}
+#toast.show{transform:none}
+#toast .t-title{color:var(--gold2);font-family:var(--serif);font-size:1.1rem;margin-bottom:6px}
+#toast .t-body{color:var(--muted);font-size:.82rem;line-height:1.6}
+
+@media(max-width:980px){
+  .hero{grid-template-columns:1fr;text-align:center;padding-top:140px}
+  .hero p{margin-inline:auto}.hero-cta{justify-content:center}
+  .hero-watch{margin-top:50px}.hero-watch svg{width:70vw}
+  .grid,.svc{grid-template-columns:repeat(2,1fr)}
+  .stats{grid-template-columns:1fr}
+  .founder{grid-template-columns:1fr}
+  .foot-grid{grid-template-columns:1fr 1fr}
+  nav{display:none}
+}
+@media(max-width:560px){.grid,.svc{grid-template-columns:1fr}.wl-form{flex-direction:column}.wl-form input{border-right:1px solid rgba(234,231,224,.2);border-bottom:none}}
+</style>
+</head>
+<body>
+
+<div id="loader"><div class="l-logo">CHASI.UZ</div></div>
+
+<header id="header">
+  <a class="logo" href="#">CHASI<span>.UZ</span></a>
+  <nav>
+    <a href="#collection">Коллекция</a>
+    <a href="#waitlist">Лист ожидания</a>
+    <a href="#services">Сервис</a>
+    <a href="#founder">О нас</a>
+    <a href="#contacts">Контакты</a>
+  </nav>
+  <button class="auth-btn" id="authBtn">Войти</button>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div>
+    <span class="hero-tag">Бутик часов · Ташкент</span>
+    <h1>Время —<br>это <em>искусство</em>,<br>которое вы носите</h1>
+    <p>Оригинальные швейцарские часы: Rolex, Audemars Piguet, Patek Philippe, Tissot, Longines. Более 50 000 клиентов доверили нам свой выбор за 10 лет.</p>
+    <div class="hero-cta">
+      <a href="#collection" class="btn btn-gold">Смотреть коллекцию</a>
+      <a href="#waitlist" class="btn btn-ghost">Лист ожидания</a>
+    </div>
+  </div>
+  <div class="hero-watch" id="heroWatch"></div>
+  <div class="hero-scroll"><i></i>Листайте вниз</div>
+</section>
+
+<!-- BRANDS MARQUEE -->
+<div class="marquee"><div class="marquee-track" id="marquee"></div></div>
+
+<!-- COLLECTION -->
+<section id="collection">
+  <div class="sec-head reveal">
+    <div><span class="sec-label">Избранное</span><h2>Коллекция сезона</h2></div>
+    <a href="#" class="sec-link">Весь каталог →</a>
+  </div>
+  <div class="grid" id="products"></div>
+</section>
+
+<!-- WAITLIST -->
+<section class="waitlist" id="waitlist">
+  <div class="reveal">
+    <span class="sec-label">Предзаказ</span>
+    <h2>Нужной модели нет в наличии?</h2>
+    <p>Встаньте в лист ожидания — мы привезём модель под вас и сообщим в Telegram в день поступления. Клиенты с депозитом получают приоритет и фиксацию цены.</p>
+    <form class="wl-form" id="wlForm">
+      <input type="text" placeholder="Модель, которую вы ищете (напр. Rolex Submariner)" required>
+      <button class="btn btn-gold" type="submit">Встать в очередь</button>
+    </form>
+    <div class="wl-count">Сейчас в листе ожидания: <b id="wlNum">37</b> человек</div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section>
+  <div class="stats">
+    <div class="stat reveal"><div class="num" data-count="50000">0</div><div class="lbl">довольных клиентов</div></div>
+    <div class="stat reveal" style="transition-delay:.12s"><div class="num" data-count="10">0</div><div class="lbl">лет на рынке часов</div></div>
+    <div class="stat reveal" style="transition-delay:.24s"><div class="num" data-count="24">0</div><div class="lbl">месяца гарантии на механизм</div></div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section id="services">
+  <div class="sec-head reveal">
+    <div><span class="sec-label">Почему мы</span><h2>Больше, чем магазин</h2></div>
+  </div>
+  <div class="svc">
+    <div class="svc-item reveal"><span class="ico">✦</span><h3>Цифровой паспорт часов</h3><p>Каждая покупка получает QR-паспорт: гарантия, история обслуживания, подлинность — всё в вашем личном кабинете.</p></div>
+    <div class="svc-item reveal" style="transition-delay:.1s"><span class="ico">✦</span><h3>Напоминание о ТО</h3><p>Через год после покупки мы сами напомним, что механизму пора на профилактику, и запишем вас на удобное время.</p></div>
+    <div class="svc-item reveal" style="transition-delay:.2s"><span class="ico">✦</span><h3>Trade-in</h3><p>Обменяйте свои часы на новую модель с доплатой. Честная оценка по фото за 24 часа.</p></div>
+    <div class="svc-item reveal" style="transition-delay:.3s"><span class="ico">✦</span><h3>Программа лояльности</h3><p>Баллы с каждой покупки, персональные скидки и привилегии за рекомендации друзьям.</p></div>
+  </div>
+</section>
+
+<!-- FOUNDER -->
+<section class="founder" id="founder">
+  <div class="founder-visual reveal"><svg id="founderWatch"></svg></div>
+  <div class="reveal" style="transition-delay:.15s">
+    <span class="sec-label">Основатель</span>
+    <blockquote>«Часы — это не механизм. Это искусство, отражающее мастерство, традиции и инновации.»</blockquote>
+    <p>Меня зовут Сардор. Уже десять лет я занимаюсь часами: путешествую по миру, изучаю новейшие тенденции и привожу своим клиентам лучшие модели.</p>
+    <p>Моя страсть привела меня в Европу, где я прошёл обучение по созданию собственных швейцарских часов.</p>
+    <div class="sig">— Сардор</div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer id="contacts">
+  <div class="foot-grid">
+    <div>
+      <a class="logo" href="#">CHASI<span>.UZ</span></a>
+      <p style="color:var(--muted);font-size:.85rem;line-height:1.8;margin-top:20px;font-weight:300">Бутик оригинальных швейцарских часов в центре Ташкента.</p>
+    </div>
+    <div><h4>Меню</h4><a href="#collection">Коллекция</a><a href="#waitlist">Лист ожидания</a><a href="#services">Сервис</a><a href="#founder">О нас</a></div>
+    <div><h4>Магазин</h4><li>Улица Мирабад, дом 12</li><li>Между Grand Mir Hotel и МВД</li><li>Пн – Вс, 11:30 – 21:00</li><a href="tel:+998909030004">+998 90 903 00 04</a></div>
+    <div><h4>Мы на связи</h4><a href="https://t.me/chasiuz">Telegram</a><a href="https://www.instagram.com/chasi.uz3/">Instagram</a></div>
+  </div>
+  <div class="foot-bottom"><span>© 2026 CHASI.UZ · Все права защищены</span><span>Оплата: Click · Payme · Visa · Mastercard</span></div>
+</footer>
+
+<div id="toast"><div class="t-title" id="tTitle"></div><div class="t-body" id="tBody"></div></div>
+
+<script>
+/* ============ SVG watch generator ============ */
+function watchSVG(dial, accent, size, live){
+  let ticks='';
+  for(let i=0;i<60;i++){
+    const a=i*6*Math.PI/180, maj=i%5===0;
+    const r1=maj?150:158, r2=170;
+    const x1=200+r1*Math.sin(a), y1=200-r1*Math.cos(a);
+    const x2=200+r2*Math.sin(a), y2=200-r2*Math.cos(a);
+    ticks+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${maj?accent:'rgba(234,231,224,.35)'}" stroke-width="${maj?3:1}"/>`;
+  }
+  const id='g'+Math.random().toString(36).slice(2,7);
+  return `<svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" ${live?'class="live"':''}>
+    <defs>
+      <linearGradient id="${id}c" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#f0d9a8"/><stop offset=".5" stop-color="#8a6d3b"/><stop offset="1" stop-color="#d4af6a"/>
+      </linearGradient>
+      <radialGradient id="${id}d" cx=".35" cy=".3" r="1">
+        <stop offset="0" stop-color="${dial[0]}"/><stop offset="1" stop-color="${dial[1]}"/>
+      </radialGradient>
+    </defs>
+    <circle cx="200" cy="200" r="196" fill="url(#${id}c)"/>
+    <circle cx="200" cy="200" r="182" fill="#0c0c10"/>
+    <circle cx="200" cy="200" r="176" fill="url(#${id}d)"/>
+    ${ticks}
+    <text x="200" y="120" text-anchor="middle" fill="${accent}" font-family="Cormorant Garamond,serif" font-size="17" letter-spacing="4">CHASI.UZ</text>
+    <text x="200" y="292" text-anchor="middle" fill="rgba(234,231,224,.5)" font-family="Manrope,sans-serif" font-size="9" letter-spacing="3">SWISS MADE</text>
+    <g class="h-hour"  style="transform-origin:200px 200px"><rect x="196" y="105" width="8" height="100" rx="4" fill="${accent}"/></g>
+    <g class="h-min"   style="transform-origin:200px 200px"><rect x="197.5" y="70" width="5" height="135" rx="2.5" fill="#eae7e0"/></g>
+    <g class="h-sec"   style="transform-origin:200px 200px"><rect x="199" y="52" width="2" height="168" fill="${accent}"/><circle cx="200" cy="200" r="7" fill="${accent}"/></g>
+    <circle cx="200" cy="200" r="3" fill="#0c0c10"/>
+  </svg>`;
+}
+
+/* hero + founder watches */
+document.getElementById('heroWatch').innerHTML   = watchSVG(['#1d2430','#0b0e14'],'#d4af6a',520,true);
+document.getElementById('founderWatch').outerHTML= watchSVG(['#241d10','#0e0b06'],'#f0d9a8',380,true);
+
+/* live hands */
+function tick(){
+  const n=new Date(), s=n.getSeconds()+n.getMilliseconds()/1000,
+        m=n.getMinutes()+s/60, h=(n.getHours()%12)+m/60;
+  document.querySelectorAll('svg.live').forEach(w=>{
+    w.querySelector('.h-sec').style.transform =`rotate(${s*6}deg)`;
+    w.querySelector('.h-min').style.transform =`rotate(${m*6}deg)`;
+    w.querySelector('.h-hour').style.transform=`rotate(${h*30}deg)`;
+  });
+  requestAnimationFrame(tick);
+}
+tick();
+
+/* ============ marquee ============ */
+const brands=['ROLEX','AUDEMARS PIGUET','PATEK PHILIPPE','TISSOT','LONGINES','FRÉDÉRIQUE CONSTANT','ALPINA','ORIENT'];
+document.getElementById('marquee').innerHTML=[...brands,...brands].map(b=>`<span>${b} <b>·</b></span>`).join('');
+
+/* ============ products ============ */
+const products=[
+  {name:'Tissot Seastar 1000', cat:'Дайверские · Оригинал', price:'850 $', dial:['#123241','#07141b'], accent:'#d4af6a'},
+  {name:'Longines HydroConquest', cat:'Спорт-классика · Оригинал', price:'1 750 $', dial:['#1c1f2b','#0a0b11'], accent:'#f0d9a8'},
+  {name:'Frederique Constant', cat:'Классика · Оригинал', price:'3 000 $', dial:['#2b2118','#120d08'], accent:'#d4af6a'},
+  {name:'Alpina Startimer', cat:'Пилот · Оригинал', price:'800 $', dial:['#20262e','#0b0d11'], accent:'#f0d9a8'},
+];
+const grid=document.getElementById('products');
+products.forEach((p,i)=>{
+  const c=document.createElement('div');
+  c.className='card reveal'; c.style.transitionDelay=(i*0.1)+'s';
+  c.innerHTML=`
+    <div class="disc-badge">−10% для вас</div>
+    <div class="views-badge">просмотров: <b>0</b></div>
+    <div class="w">${watchSVG(p.dial,p.accent)}</div>
+    <h3>${p.name}</h3>
+    <div class="cat">${p.cat}</div>
+    <div class="price locked">${p.price}</div>
+    <div class="lock-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg> Войдите, чтобы увидеть цену</div>`;
+  let views=0;
+  c.addEventListener('click',()=>{
+    views++;
+    const vb=c.querySelector('.views-badge');
+    vb.classList.add('show'); vb.querySelector('b').textContent=views;
+    if(views===3){
+      c.querySelector('.disc-badge').classList.add('show');
+      toast('Персональное предложение ✦',
+        `Вы просмотрели «${p.name}» 3 раза — держите скидку −10%. В реальной системе клиент получит это сообщение в Telegram или SMS.`);
+    }
+  });
+  grid.appendChild(c);
+});
+
+/* ============ auth demo ============ */
+const authBtn=document.getElementById('authBtn');
+authBtn.addEventListener('click',()=>{
+  document.body.classList.toggle('authed');
+  const on=document.body.classList.contains('authed');
+  authBtn.textContent=on?'Сардор ✦':'Войти';
+  authBtn.classList.toggle('on',on);
+  toast(on?'Добро пожаловать!':'Вы вышли',
+        on?'Цены открыты. Теперь система запоминает, какие модели вас интересуют.':'Цены снова скрыты — доступны только авторизованным клиентам.');
+});
+
+/* ============ waitlist demo ============ */
+document.getElementById('wlForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  const inp=e.target.querySelector('input'), n=document.getElementById('wlNum');
+  n.textContent=+n.textContent+1;
+  toast('Вы в списке ✦',`«${inp.value}» добавлена в лист ожидания. Сообщим в день поступления. Владелец уже видит ваш запрос в панели спроса.`);
+  inp.value='';
+});
+
+/* ============ toast ============ */
+let tTimer;
+function toast(title,body){
+  const t=document.getElementById('toast');
+  document.getElementById('tTitle').textContent=title;
+  document.getElementById('tBody').textContent=body;
+  t.classList.add('show');
+  clearTimeout(tTimer); tTimer=setTimeout(()=>t.classList.remove('show'),5200);
+}
+
+/* ============ scroll effects ============ */
+const header=document.getElementById('header');
+addEventListener('scroll',()=>header.classList.toggle('scrolled',scrollY>40));
+
+const io=new IntersectionObserver(es=>es.forEach(e=>{
+  if(e.isIntersecting){e.target.classList.add('visible');io.unobserve(e.target);}
+}),{threshold:.15});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+/* counters */
+const cio=new IntersectionObserver(es=>es.forEach(e=>{
+  if(!e.isIntersecting)return;
+  const el=e.target, end=+el.dataset.count, t0=performance.now();
+  (function run(t){
+    const k=Math.min((t-t0)/1800,1), v=Math.round(end*(1-Math.pow(1-k,3)));
+    el.textContent=v.toLocaleString('ru-RU')+(k===1&&end>=1000?'+':'');
+    if(k<1)requestAnimationFrame(run);
+  })(t0);
+  cio.unobserve(el);
+}),{threshold:.6});
+document.querySelectorAll('[data-count]').forEach(el=>cio.observe(el));
+
+/* loader */
+addEventListener('load',()=>setTimeout(()=>document.getElementById('loader').classList.add('hide'),500));
+
+/* hero parallax */
+addEventListener('mousemove',e=>{
+  const w=document.querySelector('#heroWatch svg'); if(!w)return;
+  const x=(e.clientX/innerWidth-.5)*14, y=(e.clientY/innerHeight-.5)*10;
+  w.style.translate=`${x}px ${y}px`;
+});
+</script>
+</body>
+</html>
