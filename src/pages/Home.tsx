@@ -5,6 +5,7 @@ import WatchVisual from '../components/WatchVisual'
 import { toast } from '../toast'
 import { useAuth, useTheme } from '../App'
 import { effectivePrice, isLowStock, useProducts } from '../store/products'
+import { useI18n } from '../i18n/engine'
 
 const HERO_PHOTO: Record<string, string> = {
   onyx: 'https://images.unsplash.com/photo-1547996160-81dfa63595aa?auto=format&fit=crop&w=1000&q=80',
@@ -53,6 +54,7 @@ export default function Home() {
   const navigate = useNavigate()
   const { authed } = useAuth()
   const { theme } = useTheme()
+  const { t } = useI18n()
   const shopProducts = useProducts()
   const featured = shopProducts.filter(p => FEATURED_IDS.includes(p.id))
   const [wl, setWl] = useState(37)
@@ -65,18 +67,18 @@ export default function Home() {
       {/* HERO */}
       <section className="hero">
         <div>
-          <span className="hero-tag">Бутик часов · Ташкент</span>
-          <h1 className="big">Время —<br />это <em>искусство</em>,<br />которое вы носите</h1>
-          <p>Оригинальные швейцарские часы и реплики высшего класса: Rolex, Audemars Piguet, Patek Philippe, Tissot, Longines. Более 50 000 клиентов за 10 лет.</p>
+          <span className="hero-tag">{t('home.heroTag')}</span>
+          <h1 className="big">{t('home.heroTitle1')}<br />{t('home.heroTitle2')} <em>{t('home.heroTitleEm')}</em>{t('home.heroTitle3') && <>,<br />{t('home.heroTitle3')}</>}</h1>
+          <p>{t('home.heroText')}</p>
           <div className="hero-cta">
-            <Link to="/catalog" className="btn btn-gold">Смотреть коллекцию</Link>
-            <a href="#waitlist" className="btn btn-ghost">Лист ожидания</a>
+            <Link to="/catalog" className="btn btn-gold">{t('home.ctaCollection')}</Link>
+            <a href="#waitlist" className="btn btn-ghost">{t('home.ctaWaitlist')}</a>
           </div>
         </div>
         <div className="hero-watch">
           {theme === 'noir'
             ? <WatchSVG dial={['#1d2430', '#0b0e14']} accent="#d4af6a" live />
-            : <img className="hero-img" src={HERO_PHOTO[theme]} alt="Часы CHASI.UZ" />}
+            : <img className="hero-img" src={HERO_PHOTO[theme]} alt="CHASI.UZ" />}
         </div>
       </section>
 
@@ -90,33 +92,33 @@ export default function Home() {
       {/* FEATURED */}
       <section>
         <div className="sec-head reveal">
-          <div><span className="sec-label">Избранное</span><h2>Коллекция сезона</h2></div>
-          <Link to="/catalog" className="btn btn-ghost btn-sm">Весь каталог →</Link>
+          <div><span className="sec-label">{t('home.featuredLabel')}</span><h2>{t('home.featuredTitle')}</h2></div>
+          <Link to="/catalog" className="btn btn-ghost btn-sm">{t('home.allCatalog')}</Link>
         </div>
         <div className="grid4">
           {featured.map((p, i) => (
             <div key={p.id} className="card reveal" style={{ transitionDelay: `${i * 0.1}s` }} onClick={() => openProduct(p.id)}>
               <div className="card-corner left">
-                <span className={`cbadge ${p.category === 'original' ? 'orig' : 'copy'}`}>{p.category === 'original' ? 'Оригинал' : '1:1 клон'}</span>
+                <span className={`cbadge ${p.category === 'original' ? 'orig' : 'copy'}`}>{t(`enum.catShort.${p.category}`)}</span>
                 {p.discount > 0 && <span className="cbadge gold">−{p.discount}%</span>}
               </div>
               <div className="card-corner right">
                 {!p.inStock
-                  ? <span className="cbadge stock-order">под заказ</span>
+                  ? <span className="cbadge stock-order">{t('enum.stockOrder')}</span>
                   : isLowStock(p)
-                    ? <span className="cbadge stock-low">осталось {p.stock}</span>
-                    : <span className="cbadge stock-ok">в наличии</span>}
+                    ? <span className="cbadge stock-low">{t('enum.stockLeft', { n: p.stock })}</span>
+                    : <span className="cbadge stock-ok">{t('enum.stockIn')}</span>}
               </div>
               <div className="w"><WatchVisual product={p} /></div>
               <h3>{p.name}</h3>
-              <div className="cat">{p.style === 'diver' ? 'Дайверские' : p.style === 'dress' ? 'Классика' : 'Спорт'}</div>
+              <div className="cat">{t(`enum.style.${p.style}`)}</div>
               <div className={`price ${authed ? '' : 'locked'}`} style={{ marginTop: 12 }}>
                 {p.discount > 0
                   ? <><s className="muted" style={{ fontSize: '.85rem', marginRight: 8 }}>{p.price.toLocaleString('ru-RU')} $</s>{effectivePrice(p).toLocaleString('ru-RU')} $</>
                   : <>{p.price.toLocaleString('ru-RU')} $</>}
               </div>
-              <div className="lock-note">🔒 Войдите, чтобы увидеть цену</div>
-              <div className="card-cta muted">Открыть карточку →</div>
+              <div className="lock-note">{t('common.priceLocked')}</div>
+              <div className="card-cta muted">{t('common.openCard')}</div>
             </div>
           ))}
         </div>
@@ -125,9 +127,9 @@ export default function Home() {
       {/* WAITLIST */}
       <section className="waitband" id="waitlist">
         <div className="reveal">
-          <span className="sec-label">Предзаказ</span>
-          <h2>Нужной модели нет в наличии?</h2>
-          <p>Встаньте в лист ожидания — мы привезём модель под вас и сообщим в Telegram в день поступления. Клиенты с депозитом получают приоритет и фиксацию цены.</p>
+          <span className="sec-label">{t('home.waitlistLabel')}</span>
+          <h2>{t('home.waitlistTitle')}</h2>
+          <p>{t('home.waitlistText')}</p>
           <form className="wl-form" onSubmit={e => {
             e.preventDefault()
             if (!wlInput.trim()) return
@@ -135,11 +137,11 @@ export default function Home() {
             toast({ title: 'Вы в списке ✦', text: `«${wlInput}» добавлена в лист ожидания. Владелец уже видит ваш запрос в панели спроса CRM.` })
             setWlInput('')
           }}>
-            <input value={wlInput} onChange={e => setWlInput(e.target.value)} placeholder="Модель, которую вы ищете (напр. Rolex Submariner)" required />
-            <button className="btn btn-gold" type="submit">Встать в очередь</button>
+            <input value={wlInput} onChange={e => setWlInput(e.target.value)} placeholder={t('home.waitlistPh')} required />
+            <button className="btn btn-gold" type="submit">{t('home.waitlistBtn')}</button>
           </form>
           <div style={{ marginTop: 24, fontSize: '.78rem', letterSpacing: '.15em', textTransform: 'uppercase', color: 'var(--gold)' }}>
-            Сейчас в листе ожидания: <b style={{ fontSize: '1.05rem' }}>{wl}</b> человек
+            {t('home.waitlistCount')} <b style={{ fontSize: '1.05rem' }}>{wl}</b> {t('home.peopleUnit')}
           </div>
         </div>
       </section>
@@ -149,15 +151,15 @@ export default function Home() {
         <div className="grid3" style={{ textAlign: 'center' }}>
           <div className="reveal" style={{ padding: '46px 20px', border: '1px solid var(--line)' }}>
             <Counter end={50000} suffix="+" />
-            <div className="muted" style={{ fontSize: '.74rem', letterSpacing: '.25em', textTransform: 'uppercase', marginTop: 10 }}>довольных клиентов</div>
+            <div className="muted" style={{ fontSize: '.74rem', letterSpacing: '.25em', textTransform: 'uppercase', marginTop: 10 }}>{t('home.statClients')}</div>
           </div>
           <div className="reveal" style={{ padding: '46px 20px', border: '1px solid var(--line)', transitionDelay: '.12s' }}>
             <Counter end={10} />
-            <div className="muted" style={{ fontSize: '.74rem', letterSpacing: '.25em', textTransform: 'uppercase', marginTop: 10 }}>лет на рынке часов</div>
+            <div className="muted" style={{ fontSize: '.74rem', letterSpacing: '.25em', textTransform: 'uppercase', marginTop: 10 }}>{t('home.statYears')}</div>
           </div>
           <div className="reveal" style={{ padding: '46px 20px', border: '1px solid var(--line)', transitionDelay: '.24s' }}>
             <Counter end={24} />
-            <div className="muted" style={{ fontSize: '.74rem', letterSpacing: '.25em', textTransform: 'uppercase', marginTop: 10 }}>месяца гарантии на механизм</div>
+            <div className="muted" style={{ fontSize: '.74rem', letterSpacing: '.25em', textTransform: 'uppercase', marginTop: 10 }}>{t('home.statWarranty')}</div>
           </div>
         </div>
       </section>
@@ -165,13 +167,12 @@ export default function Home() {
       {/* SERVICES */}
       <section>
         <div className="sec-head reveal">
-          <div><span className="sec-label">Почему мы</span><h2>Больше, чем магазин</h2></div>
+          <div><span className="sec-label">{t('home.whyLabel')}</span><h2>{t('home.whyTitle')}</h2></div>
         </div>
-        <div className="svc">
-          <div className="svc-item reveal"><span className="ico">✦</span><h3>Цифровой паспорт часов</h3><p>Каждая покупка получает паспорт: серийный номер, гарантия, история обслуживания — всё в личном кабинете.</p></div>
-          <div className="svc-item reveal" style={{ transitionDelay: '.1s' }}><span className="ico">✦</span><h3>Напоминание о ТО</h3><p>Через год после покупки мы сами напомним, что механизму пора на профилактику, и запишем вас на удобное время.</p></div>
-          <div className="svc-item reveal" style={{ transitionDelay: '.2s' }}><span className="ico">✦</span><h3>Trade-in</h3><p>Обменяйте свои часы на новую модель с доплатой. Сфотографируйте их в кабинете — оценим за 24 часа.</p></div>
-          <div className="svc-item reveal" style={{ transitionDelay: '.3s' }}><span className="ico">✦</span><h3>Программа лояльности</h3><p>Баллы с каждой покупки, уровни Silver / Gold / Platinum и привилегии за рекомендации друзьям.</p></div>
+        <div className="svc svc-3">
+          <div className="svc-item reveal"><span className="ico">✦</span><h3>{t('home.svc1t')}</h3><p>{t('home.svc1d')}</p></div>
+          <div className="svc-item reveal" style={{ transitionDelay: '.1s' }}><span className="ico">✦</span><h3>{t('home.svc2t')}</h3><p>{t('home.svc2d')}</p></div>
+          <div className="svc-item reveal" style={{ transitionDelay: '.2s' }}><span className="ico">✦</span><h3>{t('home.svc4t')}</h3><p>{t('home.svc4d')}</p></div>
         </div>
       </section>
 
@@ -180,17 +181,17 @@ export default function Home() {
         <div className="reveal" style={{ display: 'flex', justifyContent: 'center' }}>
           {theme === 'noir'
             ? <WatchSVG dial={['#241d10', '#0e0b06']} accent="#f0d9a8" live className="" />
-            : <img className="founder-img" src={FOUNDER_PHOTO} alt="Мастерская" />}
+            : <img className="founder-img" src={FOUNDER_PHOTO} alt="CHASI.UZ" />}
         </div>
         <div className="reveal" style={{ transitionDelay: '.15s' }}>
-          <span className="sec-label">Основатель</span>
+          <span className="sec-label">{t('home.founderLabel')}</span>
           <blockquote style={{ fontFamily: 'var(--serif)', fontSize: '1.55rem', fontStyle: 'italic', lineHeight: 1.5, color: 'var(--gold2)', marginBottom: 24 }}>
-            «Часы — это не механизм. Это искусство, отражающее мастерство, традиции и инновации.»
+            {t('home.founderQuote')}
           </blockquote>
           <p className="muted" style={{ lineHeight: 1.85, fontWeight: 300, marginBottom: 14 }}>
-            Меня зовут Сардор. Уже десять лет я занимаюсь часами: путешествую по миру, изучаю новейшие тенденции и привожу своим клиентам лучшие модели.
+            {t('home.founderText')}
           </p>
-          <div style={{ fontFamily: 'var(--serif)', fontSize: '1.25rem', color: 'var(--gold)', letterSpacing: '.1em', marginTop: 8 }}>— Сардор</div>
+          <div style={{ fontFamily: 'var(--serif)', fontSize: '1.25rem', color: 'var(--gold)', letterSpacing: '.1em', marginTop: 8 }}>{t('home.founderName')}</div>
         </div>
       </section>
     </>

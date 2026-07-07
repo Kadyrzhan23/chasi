@@ -176,7 +176,7 @@ export default function Passport() {
             </div>
             <div className="coupon">
               <div className="c-v">+5%</div>
-              <div className="c-t">к оценке при trade-in: часы с паспортом и сервисной историей дороже</div>
+              <div className="c-t">к стоимости при перепродаже: часы с паспортом и сервисной историей ценятся выше</div>
             </div>
           </div>
         </div>

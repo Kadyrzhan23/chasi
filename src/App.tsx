@@ -10,6 +10,7 @@ import Admin from './pages/Admin'
 import ProductEdit from './pages/ProductEdit'
 import Passport from './pages/Passport'
 import { CartProvider, useCart } from './store/cart'
+import { I18nProvider, LANGS, useI18n } from './i18n/engine'
 import { onToast, toast, ToastMsg } from './toast'
 
 /* ---------- auth (демо) ---------- */
@@ -54,17 +55,18 @@ function ToastHost() {
 }
 
 const LINKS = [
-  { to: '/', label: 'Главная', end: true },
-  { to: '/catalog', label: 'Каталог' },
-  { to: '/gift-sets', label: 'Наборы' },
-  { to: '/account', label: 'Кабинет' },
-  { to: '/admin', label: 'CRM · демо' },
+  { to: '/', key: 'nav.home', end: true },
+  { to: '/catalog', key: 'nav.catalog' },
+  { to: '/gift-sets', key: 'nav.gifts' },
+  { to: '/account', key: 'nav.account' },
+  { to: '/admin', key: 'nav.crm' },
 ]
 
 function Header() {
   const { authed, toggle } = useAuth()
   const { theme, setTheme } = useTheme()
   const { count } = useCart()
+  const { lang, setLang, t } = useI18n()
   const [open, setOpen] = useState(false)
   const cls = ({ isActive }: { isActive: boolean }) => (isActive ? 'active' : '')
   return (
@@ -72,9 +74,16 @@ function Header() {
       <header className="hdr">
         <NavLink to="/" className="logo" onClick={() => setOpen(false)}>CHASI<span>.UZ</span></NavLink>
         <nav className="nav">
-          {LINKS.map(l => <NavLink key={l.to} to={l.to} end={l.end} className={cls}>{l.label}</NavLink>)}
+          {LINKS.map(l => <NavLink key={l.to} to={l.to} end={l.end} className={cls}>{t(l.key)}</NavLink>)}
         </nav>
         <div className="hdr-right">
+          <div className="vswitch lang" title="Язык · Language · Til">
+            {LANGS.map(l => (
+              <button key={l.id} className={lang === l.id ? 'on' : ''} onClick={() => setLang(l.id)}>
+                {l.label}
+              </button>
+            ))}
+          </div>
           <div className="vswitch" title="Переключить дизайн-версию">
             {THEMES.map(t => (
               <button key={t.id} className={theme === t.id ? 'on' : ''} title={t.label} onClick={() => setTheme(t.id)}>
@@ -91,7 +100,7 @@ function Header() {
             {count > 0 && <span className="cart-count">{count}</span>}
           </NavLink>
           <button className={`auth-btn ${authed ? 'on' : ''}`} onClick={toggle}>
-            {authed ? 'Азиз ✦' : 'Войти'}
+            {authed ? 'Азиз ✦' : t('common.login')}
           </button>
           <button className="burger" aria-label="Меню" onClick={() => setOpen(o => !o)}>
             {open ? '✕' : '☰'}
@@ -101,7 +110,7 @@ function Header() {
       <nav className={`mmenu ${open ? 'open' : ''}`}>
         {LINKS.map(l => (
           <NavLink key={l.to} to={l.to} end={l.end} className={cls} onClick={() => setOpen(false)}>
-            {l.label}
+            {t(l.key)}
           </NavLink>
         ))}
       </nav>
@@ -110,31 +119,32 @@ function Header() {
 }
 
 function Footer() {
+  const { t } = useI18n()
   return (
     <footer>
       <div className="foot-grid">
         <div>
           <span className="logo">CHASI<span>.UZ</span></span>
           <p className="muted" style={{ fontSize: '.85rem', lineHeight: 1.8, marginTop: 18, fontWeight: 300 }}>
-            Бутик часов в центре Ташкента. Оригиналы и качественные реплики мировых брендов.
+            {t('footer.blurb')}
           </p>
         </div>
         <div>
-          <h4>Магазин</h4>
-          <div className="fi">Улица Мирабад, дом 12</div>
-          <div className="fi">Между Grand Mir Hotel и МВД</div>
-          <div className="fi">Пн – Вс, 11:30 – 21:00</div>
+          <h4>{t('footer.shop')}</h4>
+          <div className="fi">{t('footer.addr1')}</div>
+          <div className="fi">{t('footer.addr2')}</div>
+          <div className="fi">{t('footer.hours')}</div>
           <a href="tel:+998909030004">+998 90 903 00 04</a>
         </div>
         <div>
-          <h4>Мы на связи</h4>
+          <h4>{t('footer.contact')}</h4>
           <a href="https://t.me/chasiuz" target="_blank" rel="noreferrer">Telegram</a>
           <a href="https://www.instagram.com/chasi.uz3/" target="_blank" rel="noreferrer">Instagram</a>
         </div>
       </div>
       <div className="foot-bottom">
-        <span>© 2026 CHASI.UZ · Демонстрационный прототип</span>
-        <span>Оплата: Click · Payme · Visa · Mastercard</span>
+        <span>{t('footer.copyright')}</span>
+        <span>{t('footer.payments')}</span>
       </div>
     </footer>
   )
@@ -166,6 +176,7 @@ export default function App() {
   return (
     <AuthCtx.Provider value={{ authed, toggle }}>
       <ThemeCtx.Provider value={{ theme, setTheme }}>
+      <I18nProvider>
       <HashRouter>
         <CartProvider>
         <div className={authed ? 'authed' : ''} data-theme={theme}>
@@ -188,6 +199,7 @@ export default function App() {
         </div>
         </CartProvider>
       </HashRouter>
+      </I18nProvider>
       </ThemeCtx.Provider>
     </AuthCtx.Provider>
   )

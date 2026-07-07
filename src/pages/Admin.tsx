@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { clients, Client, demand, DISCOUNT_OPTIONS, DISCOUNT_PIN, giftSets, GIFT_BOX, interests, OnlineOrder, PAYMENT_LABEL, products, Sale, salesMock, serviceDue, tradeIns, views7d, dailyVisits } from '../data/mock'
+import { clients, Client, demand, DISCOUNT_OPTIONS, DISCOUNT_PIN, giftSets, GIFT_BOX, interests, OnlineOrder, PAYMENT_LABEL, products, Sale, salesMock, serviceDue, views7d, dailyVisits } from '../data/mock'
 import { updateOrderStatus, useOrders } from '../store/orders'
 import { effectivePrice, isLowStock, setDiscount, setStock, useProducts } from '../store/products'
 import { toast } from '../toast'
 
-type Tab = 'dash' | 'products' | 'weborders' | 'neworder' | 'sales' | 'interest' | 'demand' | 'tradein' | 'service' | 'clients'
+type Tab = 'dash' | 'products' | 'weborders' | 'neworder' | 'sales' | 'interest' | 'demand' | 'service' | 'clients'
 
 type Prefill = { productId: number; clientId: number; orderId?: string }
 
@@ -444,7 +444,6 @@ export default function Admin() {
         <button className={tab === 'sales' ? 'on' : ''} onClick={() => setTab('sales')}>▤ Продажи</button>
         <button className={tab === 'interest' ? 'on' : ''} onClick={() => setTab('interest')}>♦ Интересы клиентов</button>
         <button className={tab === 'demand' ? 'on' : ''} onClick={() => setTab('demand')}>◈ Спрос · лист ожидания</button>
-        <button className={tab === 'tradein' ? 'on' : ''} onClick={() => setTab('tradein')}>⇄ Trade-in заявки</button>
         <button className={tab === 'service' ? 'on' : ''} onClick={() => setTab('service')}>⌚ Скоро ТО</button>
         <button className={tab === 'clients' ? 'on' : ''} onClick={() => setTab('clients')}>◉ Клиенты</button>
       </aside>
@@ -551,32 +550,6 @@ export default function Admin() {
                 ≈ {demand.reduce((s, d) => s + d.queue * d.avgBudget, 0).toLocaleString('ru-RU')} $
               </div>
             </div>
-          </>
-        )}
-
-        {tab === 'tradein' && (
-          <>
-            <span className="sec-label">CRM · выкуп и обмен</span>
-            <h2 style={{ marginBottom: 26 }}>Trade-in заявки</h2>
-            <table className="tbl">
-              <thead><tr><th>Клиент</th><th>Его часы</th><th>Состояние</th><th>Хочет взамен</th><th>Оценка</th><th>Статус</th></tr></thead>
-              <tbody>
-                {tradeIns.map(t => (
-                  <tr key={t.id}>
-                    <td>{t.clientName}</td>
-                    <td>{t.model} · {t.year}<div className="muted" style={{ fontSize: '.7rem' }}>фото приложено ⌚</div></td>
-                    <td className="muted" style={{ maxWidth: 200 }}>{t.condition}</td>
-                    <td>{t.wants}</td>
-                    <td style={{ color: 'var(--gold2)' }}>{t.offer} $</td>
-                    <td>
-                      {t.status === 'новая' && <span className="pill y">новая</span>}
-                      {t.status === 'оценена' && <span className="pill b">оценена</span>}
-                      {t.status === 'сделка' && <span className="pill g">сделка ✓</span>}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
           </>
         )}
 

@@ -1,13 +1,12 @@
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import WatchVisual from '../components/WatchVisual'
-import { CATEGORY_LABEL, STYLE_LABEL } from '../data/mock'
 import { useAuth } from '../App'
 import { useCart } from '../store/cart'
 import { effectivePrice, isLastOne, isLowStock, useProducts } from '../store/products'
-import { productTags, relatedProducts } from '../store/tags'
+import { catalogLink, relatedProducts } from '../store/tags'
+import { useI18n } from '../i18n/engine'
 import { toast } from '../toast'
 
-const GENDER_LABEL: Record<string, string> = { 'муж': 'Мужские', 'жен': 'Женские', 'унисекс': 'Унисекс' }
 const money = (n: number) => n.toLocaleString('ru-RU') + ' $'
 
 export default function Product() {
@@ -15,6 +14,7 @@ export default function Product() {
   const navigate = useNavigate()
   const { authed } = useAuth()
   const { add, items } = useCart()
+  const { t } = useI18n()
 
   const shopProducts = useProducts()
   const product = shopProducts.find(p => p.id === Number(id))
@@ -23,10 +23,10 @@ export default function Product() {
   if (!product) {
     return (
       <section style={{ padding: '120px 4vw', textAlign: 'center' }}>
-        <span className="sec-label">Ошибка</span>
-        <h1 className="big" style={{ fontSize: 'clamp(2rem,4vw,3rem)' }}>Модель не найдена</h1>
-        <p className="muted" style={{ margin: '18px 0 28px' }}>Возможно, товар снят с продажи.</p>
-        <Link className="btn btn-gold" to="/catalog">В каталог</Link>
+        <span className="sec-label">404</span>
+        <h1 className="big" style={{ fontSize: 'clamp(2rem,4vw,3rem)' }}>{t('product.notFound')}</h1>
+        <p className="muted" style={{ margin: '18px 0 28px' }}>{t('product.notFoundText')}</p>
+        <Link className="btn btn-gold" to="/catalog">{t('product.toCatalog')}</Link>
       </section>
     )
   }
@@ -36,22 +36,28 @@ export default function Product() {
   const hasDiscount = p.discount > 0
   const low = isLowStock(p)
   const last = isLastOne(p)
-  const tags = productTags(p)
+  const tags = [
+    { label: p.brand, to: catalogLink({ brand: p.brand }) },
+    { label: t(`enum.cat.${p.category}`), to: catalogLink({ cat: p.category }) },
+    { label: t(`enum.style.${p.style}`), to: catalogLink({ style: p.style }) },
+    { label: t(`enum.movement.${p.movement}`), to: catalogLink({ movement: p.movement }) },
+  ]
   const related = relatedProducts(p, shopProducts)
 
+  const waterHint = p.water >= 200 ? ` · ${t('product.waterSwim')}` : p.water >= 100 ? ` · ${t('product.waterSplash')}` : ` · ${t('product.waterRain')}`
   // 6–8 ключевых характеристик
   const specs: [string, string][] = [
-    ['Бренд', p.brand],
-    ['Модель', p.name],
-    ['Класс товара', CATEGORY_LABEL[p.category]],
-    ['Механизм', p.movement],
-    ['Запас хода', p.reserve > 0 ? `до ${p.reserve} ч` : 'кварц — от батареи'],
-    ['Водонепроницаемость', `${p.water} м${p.water >= 200 ? ' · можно плавать и нырять' : p.water >= 100 ? ' · брызги, душ, плавание' : ' · брызги и дождь'}`],
-    ['Стекло', p.glass === 'сапфировое' ? 'сапфировое (не царапается)' : 'минеральное'],
-    ['Диаметр корпуса', `${p.diameter} мм`],
-    ['Стиль', STYLE_LABEL[p.style]],
-    ['Для кого', GENDER_LABEL[p.gender] ?? p.gender],
-    ['Гарантия', '2 года на механизм'],
+    [t('product.sBrand'), p.brand],
+    [t('product.sModel'), p.name],
+    [t('product.sClass'), t(`enum.cat.${p.category}`)],
+    [t('product.sMovement'), t(`enum.movement.${p.movement}`)],
+    [t('product.sReserve'), p.reserve > 0 ? t('product.reserveVal', { n: p.reserve }) : t('product.reserveQuartz')],
+    [t('product.sWater'), `${p.water} ${t('units.m')}${waterHint}`],
+    [t('product.sGlass'), t(`enum.glassFull.${p.glass}`)],
+    [t('product.sDiameter'), `${p.diameter} ${t('units.mm')}`],
+    [t('product.sStyle'), t(`enum.style.${p.style}`)],
+    [t('product.sFor'), t(`enum.genderFull.${p.gender}`)],
+    [t('product.sWarranty'), t('product.warrantyVal')],
   ]
 
   const addToCart = () => {
@@ -71,7 +77,7 @@ export default function Product() {
     <>
       <section style={{ padding: '40px 4vw 0' }}>
         <div className="crumbs">
-          <Link to="/catalog">Каталог</Link> <span>/</span> <span>{p.brand}</span> <span>/</span> <b>{p.name}</b>
+          <Link to="/catalog">{t('product.crumb')}</Link> <span>/</span> <span>{p.brand}</span> <span>/</span> <b>{p.name}</b>
         </div>
       </section>
 
@@ -79,10 +85,10 @@ export default function Product() {
         <div className="product-media">
           <WatchVisual product={p} live />
           <div className="product-tags">
-            <span className={`tag ${p.category === 'original' ? 'orig' : 'copy'}`}>{CATEGORY_LABEL[p.category]}</span>
-            {p.inStock ? <span className="pill g">в наличии</span> : <span className="pill r">под заказ</span>}
+            <span className={`tag ${p.category === 'original' ? 'orig' : 'copy'}`}>{t(`enum.cat.${p.category}`)}</span>
+            {p.inStock ? <span className="pill g">{t('enum.stockIn')}</span> : <span className="pill r">{t('enum.stockOrder')}</span>}
             {hasDiscount && <span className="pill y">−{p.discount}%</span>}
-            {low && <span className="pill r">осталось {p.stock}</span>}
+            {low && <span className="pill r">{t('enum.stockLeft', { n: p.stock })}</span>}
           </div>
         </div>
 
@@ -90,16 +96,16 @@ export default function Product() {
           <span className="sec-label">{p.brand}</span>
           <h1 className="big" style={{ fontSize: 'clamp(2rem,3.6vw,3.2rem)', marginBottom: 6 }}>{p.name}</h1>
           <div className="muted" style={{ fontSize: '.82rem', letterSpacing: '.06em', marginBottom: 18 }}>
-            {STYLE_LABEL[p.style]} · ⌀{p.diameter} мм · {GENDER_LABEL[p.gender] ?? p.gender}
+            {t(`enum.style.${p.style}`)} · ⌀{p.diameter} {t('units.mm')} · {t(`enum.genderFull.${p.gender}`)}
           </div>
 
           <div className="tagrow">
-            {tags.map(t => (
-              <Link key={t.label} to={t.to} className="tagchip">{t.label}</Link>
+            {tags.map(tg => (
+              <Link key={tg.label} to={tg.to} className="tagchip">{tg.label}</Link>
             ))}
           </div>
 
-          <h4 className="spec-h">Характеристики</h4>
+          <h4 className="spec-h">{t('product.specsTitle')}</h4>
           <table className="spec-table">
             <tbody>
               {specs.map(([k, v]) => (
@@ -113,30 +119,29 @@ export default function Product() {
               ? <>
                   <s className="muted" style={{ fontSize: '1.2rem', marginRight: 12 }}>{money(p.price)}</s>
                   {money(price)}
-                  <span className="save-pill">выгода {money(p.price - price)}</span>
+                  <span className="save-pill">{t('common.save', { sum: money(p.price - price) })}</span>
                 </>
               : money(p.price)}
           </div>
-          <div className="lock-note" style={{ marginBottom: 22 }}>🔒 Войдите, чтобы увидеть цену</div>
+          <div className="lock-note" style={{ marginBottom: 22 }}>{t('common.priceLocked')}</div>
 
           {p.inStock && low && (
             <div className="urgency">
-              🔥 {last ? 'Последний экземпляр!' : `Осталось всего ${p.stock} шт.`} Торопитесь — модель почти разобрали.
+              🔥 {last ? t('product.urgencyLast') : t('product.urgencyLeft', { n: p.stock })} {t('product.urgencyTail')}
             </div>
           )}
 
           <div className="product-actions">
             <button className="btn btn-gold" onClick={addToCart}>
-              {!authed ? 'Войдите, чтобы купить' : p.inStock ? (inCart ? `В корзине: ${inCart} · добавить ещё` : 'В корзину') : 'Встать в очередь'}
+              {!authed ? t('common.buyLoginFirst') : p.inStock ? (inCart ? t('common.inCart', { n: inCart }) : t('common.addToCart')) : t('common.queue')}
             </button>
             {authed && inCart > 0 && (
-              <button className="btn btn-ghost" onClick={() => navigate('/cart')}>Перейти в корзину →</button>
+              <button className="btn btn-ghost" onClick={() => navigate('/cart')}>{t('common.goToCart')}</button>
             )}
           </div>
 
           <div className="product-note muted">
-            Доставка по Ташкенту и всему Узбекистану. Оплата: Payme, Click или при получении.
-            Можно добавить подарочный бокс и <Link to="/gift-sets" style={{ color: 'var(--gold2)' }}>подарочный набор</Link>.
+            {t('product.note')} <Link to="/gift-sets" style={{ color: 'var(--gold2)' }}>{t('product.noteLink')}</Link>.
           </div>
         </div>
       </div>
@@ -144,28 +149,28 @@ export default function Product() {
       {related.length > 0 && (
         <section style={{ padding: '10px 4vw 70px' }}>
           <div className="sec-head" style={{ marginBottom: 28 }}>
-            <div><span className="sec-label">Вам подойдёт</span><h2 style={{ fontSize: 'clamp(1.6rem,3vw,2.2rem)' }}>Похожие модели</h2></div>
-            <Link to={`/catalog?brand=${encodeURIComponent(p.brand)}`} className="btn btn-ghost btn-sm">Все {p.brand} →</Link>
+            <div><span className="sec-label">{t('product.similarLabel')}</span><h2 style={{ fontSize: 'clamp(1.6rem,3vw,2.2rem)' }}>{t('product.similarTitle')}</h2></div>
+            <Link to={`/catalog?brand=${encodeURIComponent(p.brand)}`} className="btn btn-ghost btn-sm">{t('product.allBrand', { brand: p.brand })}</Link>
           </div>
           <div className="grid4">
             {related.map(r => (
               <div key={r.id} className="card" onClick={() => navigate(`/product/${r.id}`)}>
                 <div className="card-corner right">
                   {!r.inStock
-                    ? <span className="cbadge stock-order">под заказ</span>
+                    ? <span className="cbadge stock-order">{t('enum.stockOrder')}</span>
                     : isLowStock(r)
-                      ? <span className="cbadge stock-low">осталось {r.stock}</span>
-                      : <span className="cbadge stock-ok">в наличии</span>}
+                      ? <span className="cbadge stock-low">{t('enum.stockLeft', { n: r.stock })}</span>
+                      : <span className="cbadge stock-ok">{t('enum.stockIn')}</span>}
                 </div>
                 <div className="w"><WatchVisual product={r} /></div>
                 <h3>{r.name}</h3>
-                <div className="cat">{r.brand} · {STYLE_LABEL[r.style]}</div>
+                <div className="cat">{r.brand} · {t(`enum.style.${r.style}`)}</div>
                 <div className={`price ${authed ? '' : 'locked'}`} style={{ marginTop: 12 }}>
                   {r.discount > 0
                     ? <><s className="muted" style={{ fontSize: '.85rem', marginRight: 8 }}>{money(r.price)}</s>{money(effectivePrice(r))}</>
                     : money(r.price)}
                 </div>
-                <div className="lock-note">🔒 Войдите, чтобы увидеть цену</div>
+                <div className="lock-note">{t('common.priceLocked')}</div>
               </div>
             ))}
           </div>

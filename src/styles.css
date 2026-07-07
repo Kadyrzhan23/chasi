@@ -531,3 +531,18 @@ footer{border-top:1px solid var(--line);padding:56px 4vw 26px;background:var(--b
 @media(max-width:560px){
   .edit-form{grid-template-columns:1fr}
 }
+
+/* ============ ПЕРЕКЛЮЧАТЕЛЬ ЯЗЫКА (feature/shop-cart) ============ */
+.vswitch.lang button{width:auto;min-width:30px;height:30px;border-radius:14px;padding:0 8px;font-size:.62rem;letter-spacing:.05em}
+@media(max-width:1000px){
+  .hdr-right{gap:8px}
+  .vswitch.lang{order:-1}
+}
+@media(max-width:420px){
+  .vswitch:not(.lang){display:none}
+}
+
+/* услуги: три карточки в ряд */
+.svc.svc-3{grid-template-columns:repeat(3,1fr)}
+@media(max-width:1000px){ .svc.svc-3{grid-template-columns:repeat(2,1fr)} }
+@media(max-width:560px){ .svc.svc-3{grid-template-columns:1fr} }

@@ -136,18 +136,6 @@ export const demand: Demand[] = [
   { id: 5, model: 'Cartier Tank Must (оригинал)', brand: 'Cartier', queue: 5, deposits: 0, avgBudget: 3100 },
 ]
 
-/* ============ CRM: trade-in заявки ============ */
-export type TradeIn = {
-  id: number; clientName: string; model: string; year: number
-  condition: string; wants: string; offer: number; status: 'новая' | 'оценена' | 'сделка'
-}
-
-export const tradeIns: TradeIn[] = [
-  { id: 1, clientName: 'Тимур Рахимов',    model: 'Tissot PRC 200',            year: 2022, condition: 'хорошее, мелкие царапины на браслете', wants: 'Longines HydroConquest', offer: 260,  status: 'оценена' },
-  { id: 2, clientName: 'Жасур Ибрагимов',  model: 'Orient Bambino V2',         year: 2021, condition: 'отличное, полный комплект',            wants: 'FC Classics',            offer: 140,  status: 'новая' },
-  { id: 3, clientName: 'Дильноза Юсупова', model: 'Longines Conquest Classic', year: 2020, condition: 'отличное, коробка и документы',        wants: 'FC Moonphase Limited',   offer: 620,  status: 'сделка' },
-]
-
 /* ============ CRM: продажи (для отчёта и создания заказов) ============ */
 export type Sale = {
   id: number
