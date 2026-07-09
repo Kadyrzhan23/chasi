@@ -12,6 +12,7 @@ import Loyalty from './pages/Loyalty'
 import Passport from './pages/Passport'
 import { CartProvider, useCart } from './store/cart'
 import { I18nProvider, LANGS, useI18n } from './i18n/engine'
+import { initTelegram, isTelegram } from './telegram'
 import { onToast, toast, ToastMsg } from './toast'
 
 /* ---------- auth (демо) ---------- */
@@ -161,6 +162,13 @@ function Footer() {
 
 export default function App() {
   const [authed, setAuthed] = useState(false)
+
+  // Telegram Mini App: инициализация + автологин, если открыто внутри Telegram
+  useEffect(() => {
+    initTelegram()
+    if (isTelegram()) setAuthed(true)
+  }, [])
+
   const [theme, setThemeState] = useState<Theme>(() => {
     const t = localStorage.getItem('chasi-theme') as Theme
     return THEMES.some(x => x.id === t) ? t : 'noir'
