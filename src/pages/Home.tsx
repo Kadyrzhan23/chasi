@@ -6,6 +6,7 @@ import { toast } from '../toast'
 import { useAuth, useTheme } from '../App'
 import { effectivePrice, isLowStock, useProducts } from '../store/products'
 import EarnBadge from '../components/EarnBadge'
+import ServiceBooking from '../components/ServiceBooking'
 import { useI18n } from '../i18n/engine'
 
 const HERO_PHOTO: Record<string, string> = {
@@ -195,6 +196,11 @@ export default function Home() {
           </p>
           <div style={{ fontFamily: 'var(--serif)', fontSize: '1.25rem', color: 'var(--gold)', letterSpacing: '.1em', marginTop: 8 }}>{t('home.founderName')}</div>
         </div>
+      </section>
+
+      {/* ЗАПИСЬ НА ТО */}
+      <section className="reveal">
+        <ServiceBooking />
       </section>
     </>
   )

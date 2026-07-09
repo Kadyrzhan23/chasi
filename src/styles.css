@@ -589,3 +589,40 @@ footer{border-top:1px solid var(--line);padding:56px 4vw 26px;background:var(--b
 .first-bonus .fb-i{display:inline-flex;align-items:center;justify-content:center;width:13px;height:13px;border:1px solid var(--gold);border-radius:50%;font-size:.56rem;font-weight:700;color:var(--gold);line-height:1}
 .first-bonus::after{content:attr(data-tip);position:absolute;bottom:150%;left:50%;transform:translateX(-50%) translateY(4px);white-space:nowrap;background:var(--panel2,#191922);color:var(--text);border:1px solid var(--gold);border-radius:8px;padding:8px 12px;font-size:.72rem;font-weight:400;letter-spacing:.02em;box-shadow:var(--shadow);opacity:0;pointer-events:none;transition:.2s;z-index:20}
 .first-bonus:hover::after,.first-bonus:focus::after,.first-bonus:active::after{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ============ ЗАПИСЬ НА ТО (feature/logic-of-credits) ============ */
+
+/* секция на главной / в кабинете */
+.svc-book .svc-feats{list-style:none;margin:0;padding:0;max-width:560px}
+.svc-book .svc-feats li{font-size:.9rem;font-weight:300;padding:9px 0;border-bottom:1px solid var(--line2);color:var(--text)}
+.svc-book .svc-feats li::before{content:'✦ ';color:var(--gold)}
+.svc-book.card h2{font-size:1.4rem}
+
+/* раскрывающаяся форма (CSS-анимация вместо Framer Motion) */
+.svc-form-wrap{overflow:hidden;max-height:0;opacity:0;transition:max-height .5s cubic-bezier(.16,1,.3,1),opacity .4s ease,margin-top .4s ease}
+.svc-form-wrap.open{max-height:520px;opacity:1;margin-top:22px}
+.svc-form{display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:640px;border:1px solid var(--line2);border-radius:var(--rad);background:var(--panel);padding:22px}
+.svc-form .search-inp{margin-bottom:0}
+.svc-form .svc-date{grid-column:1/-1;display:flex;flex-direction:column;gap:8px}
+.svc-form .svc-date label{font-size:.66rem;letter-spacing:.16em;text-transform:uppercase;color:var(--gold)}
+.svc-form>.btn{grid-column:1/-1;width:100%}
+
+/* CRM · недельный график записей */
+.week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-top:18px}
+.week-col{border:1px solid var(--line2);border-radius:var(--rad);background:var(--bg2);min-height:120px;display:flex;flex-direction:column}
+.week-head{padding:8px 10px;border-bottom:1px solid var(--line2);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);display:flex;justify-content:space-between;align-items:baseline}
+.week-head span{color:var(--muted);font-size:.66rem}
+.week-body{padding:8px;display:flex;flex-direction:column;gap:6px}
+.week-empty{color:var(--muted);text-align:center;font-size:.9rem;opacity:.4;margin-top:18px}
+.week-item{border:1px solid var(--line2);border-radius:8px;background:var(--panel);padding:7px 9px;font-size:.72rem;line-height:1.4;cursor:default}
+.week-item.is-new{border-color:var(--gold);background:rgba(212,175,106,.07)}
+.week-item b{display:block;color:var(--gold2)}
+.week-item span{color:var(--muted);font-size:.68rem;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+@media(max-width:1000px){
+  .svc-form{grid-template-columns:1fr}
+  .week-grid{grid-template-columns:repeat(3,1fr)}
+}
+@media(max-width:560px){
+  .week-grid{grid-template-columns:repeat(2,1fr)}
+}

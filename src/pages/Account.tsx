@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import QR from '../components/QR'
 import WatchVisual from '../components/WatchVisual'
+import ServiceBooking from '../components/ServiceBooking'
 import { myNotifications, myPurchases, myWishlist, products } from '../data/mock'
 import { toast } from '../toast'
 
@@ -85,6 +86,9 @@ export default function Account() {
             })}
             <div className="muted" style={{ fontSize: '.76rem', lineHeight: 1.7, fontWeight: 300 }}>
               ✦ Цифровой паспорт подтверждает подлинность и историю часов. QR-код на паспорте сканируется в бутике — мастер сразу видит модель, гарантию и историю обслуживания.
+            </div>
+            <div className="panel" style={{ marginTop: 26 }}>
+              <ServiceBooking variant="card" />
             </div>
           </>
         )}

@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { clients, Client, demand, DISCOUNT_OPTIONS, DISCOUNT_PIN, giftSets, GIFT_BOX, interests, OnlineOrder, PAYMENT_LABEL, products, Sale, salesMock, serviceDue, views7d, dailyVisits } from '../data/mock'
+import { BOOKING_WEEK_START, clients, Client, demand, DISCOUNT_OPTIONS, DISCOUNT_PIN, giftSets, GIFT_BOX, interests, OnlineOrder, PAYMENT_LABEL, products, Sale, salesMock, serviceDue, views7d, dailyVisits } from '../data/mock'
 import { updateOrderStatus, useOrders } from '../store/orders'
 import { effectivePrice, isLowStock, setDiscount, setStock, useProducts } from '../store/products'
+import { setBookingStatus, useBookings } from '../store/bookings'
 import { toast } from '../toast'
 
-type Tab = 'dash' | 'products' | 'weborders' | 'neworder' | 'sales' | 'interest' | 'demand' | 'service' | 'clients'
+type Tab = 'dash' | 'products' | 'weborders' | 'bookings' | 'neworder' | 'sales' | 'interest' | 'demand' | 'service' | 'clients'
 
 type Prefill = { productId: number; clientId: number; orderId?: string }
 
@@ -389,6 +390,86 @@ function WebOrders({ orders, onProcess }: { orders: OnlineOrder[]; onProcess: (o
   )
 }
 
+/* ---------- Записи на ТО ---------- */
+const DOW = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб']
+const pad2 = (n: number) => String(n).padStart(2, '0')
+const isoDate = (d: Date) => `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`
+const statusPill = (s: string) =>
+  s === 'выполнена' ? 'g' : s === 'подтверждена' ? 'b' : 'y'
+
+function ServiceBookings() {
+  const bookings = useBookings()
+  const newCount = bookings.filter(b => b.status === 'новая').length
+
+  const weekStart = new Date(BOOKING_WEEK_START + 'T00:00:00')
+  const days = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(weekStart)
+    d.setDate(weekStart.getDate() + i)
+    return d
+  })
+
+  const list = [...bookings].sort((a, b) => (b.date + b.createdAt).localeCompare(a.date + a.createdAt))
+
+  return (
+    <>
+      <span className="sec-label">CRM · сервис</span>
+      <h2 style={{ marginBottom: 8 }}>Записи на ТО</h2>
+      <p className="muted" style={{ fontSize: '.82rem', marginBottom: 24, fontWeight: 300 }}>
+        Заявки клиентов на обслуживание с сайта и из кабинета. Новых заявок: <b style={{ color: 'var(--gold2)' }}>{newCount}</b>.
+      </p>
+
+      {/* график недели */}
+      <div className="panel">
+        <h3 style={{ marginBottom: 4 }}>График записей · неделя</h3>
+        <div className="sub">{DOW[weekStart.getDay()]} {pad2(weekStart.getDate())}.{pad2(weekStart.getMonth() + 1)} — {pad2(days[6].getDate())}.{pad2(days[6].getMonth() + 1)}</div>
+        <div className="week-grid">
+          {days.map(d => {
+            const iso = isoDate(d)
+            const dayB = bookings.filter(b => b.date === iso)
+            return (
+              <div className="week-col" key={iso}>
+                <div className="week-head">{DOW[d.getDay()]}<span>{pad2(d.getDate())}.{pad2(d.getMonth() + 1)}</span></div>
+                <div className="week-body">
+                  {dayB.length === 0 && <div className="week-empty">—</div>}
+                  {dayB.map(b => (
+                    <div className={`week-item ${b.status === 'новая' ? 'is-new' : ''}`} key={b.id} title={`${b.name} · ${b.phone}`}>
+                      <b>{b.name.split(' ')[0]}</b>
+                      <span>{b.watch}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      </div>
+
+      {/* полный список */}
+      <table className="tbl" style={{ marginTop: 22 }}>
+        <thead><tr><th>Дата</th><th>Клиент</th><th>Часы · год</th><th>Статус</th><th>Действие</th></tr></thead>
+        <tbody>
+          {list.map(b => (
+            <tr key={b.id} style={b.status === 'новая' ? { background: 'rgba(212,175,106,.04)' } : undefined}>
+              <td className="muted">{b.date.split('-').reverse().join('.')}</td>
+              <td>{b.name}<div className="muted" style={{ fontSize: '.7rem' }}>{b.phone}</div></td>
+              <td>{b.watch}<div className="muted" style={{ fontSize: '.7rem' }}>{b.year || '—'}</div></td>
+              <td><span className={`pill ${statusPill(b.status)}`}>{b.status}</span></td>
+              <td>
+                {b.status === 'новая'
+                  ? <button className="btn btn-gold btn-sm" onClick={() => {
+                      setBookingStatus(b.id, 'подтверждена')
+                      toast({ title: 'Запись подтверждена ✦', text: `${b.name.split(' ')[0]}, ждём вас ${b.date.split('-').reverse().join('.')} на ТО «${b.watch}». — так уведомление придёт клиенту.` })
+                    }}>Подтвердить</button>
+                  : <span className="muted" style={{ fontSize: '.72rem' }}>—</span>}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </>
+  )
+}
+
 const digits = (s: string) => s.replace(/\D/g, '')
 
 export default function Admin() {
@@ -402,6 +483,8 @@ export default function Admin() {
   const [prefill, setPrefill] = useState<Prefill | null>(null)
   const allClients = useMemo(() => [...clients, ...extraClients], [extraClients])
   const newOrdersCount = webOrders.filter(o => o.status === 'новый').length
+  const bookings = useBookings()
+  const newBookingsCount = bookings.filter(b => b.status === 'новая').length
 
   // Клик по заказу с сайта → заполняем форму «Новый заказ»
   const processOrder = (order: OnlineOrder) => {
@@ -439,6 +522,9 @@ export default function Admin() {
         <button className={tab === 'products' ? 'on' : ''} onClick={() => setTab('products')}>▧ Продукты · склад</button>
         <button className={tab === 'weborders' ? 'on' : ''} onClick={() => setTab('weborders')}>
           🛒 Заказы с сайта {newOrdersCount > 0 && <span className="side-badge">{newOrdersCount}</span>}
+        </button>
+        <button className={tab === 'bookings' ? 'on' : ''} onClick={() => setTab('bookings')}>
+          🛠 Записи на ТО {newBookingsCount > 0 && <span className="side-badge">{newBookingsCount}</span>}
         </button>
         <button className={tab === 'neworder' ? 'on' : ''} onClick={() => setTab('neworder')}>＋ Новый заказ</button>
         <button className={tab === 'sales' ? 'on' : ''} onClick={() => setTab('sales')}>▤ Продажи</button>
@@ -479,6 +565,8 @@ export default function Admin() {
         {tab === 'weborders' && (
           <WebOrders orders={webOrders} onProcess={processOrder} />
         )}
+
+        {tab === 'bookings' && <ServiceBookings />}
 
         {tab === 'neworder' && (
           <NewOrder
