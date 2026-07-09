@@ -55,6 +55,7 @@ const ru: Dict = {
     founderQuote: '«Часы — это не механизм. Это искусство, отражающее мастерство, традиции и инновации.»',
     founderText: 'Меня зовут Сардор. Уже десять лет я занимаюсь часами: путешествую по миру, изучаю новейшие тенденции и привожу своим клиентам лучшие модели.',
     founderName: '— Сардор',
+    demoWarn: 'Это демонстрационная версия сайта — не настоящий интернет-магазин. Реальные заказы и оплата не осуществляются.',
   },
   catalog: {
     label: 'Каталог', titleA: 'Найдите', titleEm: 'свои', titleB: 'часы',
@@ -166,6 +167,7 @@ const en: Dict = {
     founderQuote: '“A watch is not a mechanism. It is art that reflects craftsmanship, tradition and innovation.”',
     founderText: 'My name is Sardor. For ten years I have worked with watches: travelling the world, studying the latest trends and bringing my clients the finest models.',
     founderName: '— Sardor',
+    demoWarn: 'This is a demo version of the website — not a real online store. No real orders or payments are processed.',
   },
   catalog: {
     label: 'Catalog', titleA: 'Find', titleEm: 'your', titleB: 'watch',
@@ -277,6 +279,7 @@ const uz: Dict = {
     founderQuote: '“Soat — bu mexanizm emas. Bu mahorat, anʼana va innovatsiyani aks ettiruvchi sanʼat.”',
     founderText: 'Mening ismim Sardor. Oʻn yildan beri soatlar bilan shugʻullanaman: dunyo boʻylab sayohat qilib, eng soʻnggi tendensiyalarni oʻrganib, mijozlarimga eng yaxshi modellarni olib kelaman.',
     founderName: '— Sardor',
+    demoWarn: 'Bu — saytning namoyish versiyasi, haqiqiy internet-doʻkon emas. Haqiqiy buyurtma va toʻlovlar amalga oshirilmaydi.',
   },
   catalog: {
     label: 'Katalog', titleA: 'Oʻz', titleEm: 'soatingizni', titleB: 'toping',

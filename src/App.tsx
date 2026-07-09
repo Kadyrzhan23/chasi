@@ -37,6 +37,18 @@ function ScrollToTop() {
   return null
 }
 
+/* ---------- глобальная полоса «демо-версия» (над хедером, на всех страницах) ---------- */
+function DemoBar() {
+  const { t } = useI18n()
+  return (
+    <div className="demo-bar" role="note">
+      <div className="demo-track">
+        {[0, 1, 2, 3, 4, 5].map(i => <span key={i}>⚠ {t('home.demoWarn')} <b>✦</b></span>)}
+      </div>
+    </div>
+  )
+}
+
 /* ---------- toast host ---------- */
 function ToastHost() {
   const [msg, setMsg] = useState<ToastMsg | null>(null)
@@ -215,6 +227,7 @@ export default function App() {
         <WishlistProvider>
         <ScrollToTop />
         <div className={authed ? 'authed' : ''} data-theme={theme}>
+          <DemoBar />
           <Header />
           <div className="page">
             <Routes>
