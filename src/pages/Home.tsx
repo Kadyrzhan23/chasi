@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import WatchSVG from '../components/WatchSVG'
 import WatchVisual from '../components/WatchVisual'
-import { toast } from '../toast'
 import { useAuth, useTheme } from '../App'
 import { effectivePrice, isLowStock, useProducts } from '../store/products'
 import EarnBadge from '../components/EarnBadge'
@@ -59,8 +58,6 @@ export default function Home() {
   const { t } = useI18n()
   const shopProducts = useProducts()
   const featured = shopProducts.filter(p => FEATURED_IDS.includes(p.id))
-  const [wl, setWl] = useState(37)
-  const [wlInput, setWlInput] = useState('')
 
   const openProduct = (id: number) => navigate(`/product/${id}`)
 
@@ -74,7 +71,7 @@ export default function Home() {
           <p>{t('home.heroText')}</p>
           <div className="hero-cta">
             <Link to="/catalog" className="btn btn-gold">{t('home.ctaCollection')}</Link>
-            <a href="#waitlist" className="btn btn-ghost">{t('home.ctaWaitlist')}</a>
+            <Link to="/gift-sets" className="btn btn-ghost">{t('nav.gifts')}</Link>
           </div>
         </div>
         <div className="hero-watch">
@@ -124,28 +121,6 @@ export default function Home() {
               <div className="card-cta muted">{t('common.openCard')}</div>
             </div>
           ))}
-        </div>
-      </section>
-
-      {/* WAITLIST */}
-      <section className="waitband" id="waitlist">
-        <div className="reveal">
-          <span className="sec-label">{t('home.waitlistLabel')}</span>
-          <h2>{t('home.waitlistTitle')}</h2>
-          <p>{t('home.waitlistText')}</p>
-          <form className="wl-form" onSubmit={e => {
-            e.preventDefault()
-            if (!wlInput.trim()) return
-            setWl(n => n + 1)
-            toast({ title: 'Вы в списке ✦', text: `«${wlInput}» добавлена в лист ожидания. Владелец уже видит ваш запрос в панели спроса CRM.` })
-            setWlInput('')
-          }}>
-            <input value={wlInput} onChange={e => setWlInput(e.target.value)} placeholder={t('home.waitlistPh')} required />
-            <button className="btn btn-gold" type="submit">{t('home.waitlistBtn')}</button>
-          </form>
-          <div style={{ marginTop: 24, fontSize: '.78rem', letterSpacing: '.15em', textTransform: 'uppercase', color: 'var(--gold)' }}>
-            {t('home.waitlistCount')} <b style={{ fontSize: '1.05rem' }}>{wl}</b> {t('home.peopleUnit')}
-          </div>
         </div>
       </section>
 

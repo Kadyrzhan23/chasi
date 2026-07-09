@@ -17,6 +17,11 @@ const ru: Dict = {
     earnPoints: '+{n} баллов', earnNote: 'За покупку начислим +{n} баллов на бонусный счёт',
     firstBonusTip: 'Бонус за первую покупку в CHASI.UZ',
   },
+  wish: {
+    add: 'В избранное', inList: 'В избранном', remove: 'Убрать из избранного', added: 'В избранном ✦', addedText: 'добавлено в избранное',
+    label: 'Избранное', title: 'Избранное', titleEm: 'часы',
+    empty: 'В избранном пусто', emptyText: 'Нажимайте ♡ на карточках — понравившиеся часы появятся здесь.', toCatalog: 'В каталог',
+  },
   book: {
     label: 'Сервис', title: 'Записаться на ТО',
     text: 'Оставьте заявку — подберём удобный день для обслуживания ваших часов. Никаких очередей: приходите к назначенному времени.',
@@ -61,7 +66,7 @@ const ru: Dict = {
     specialTitle: 'Особые фильтры ✦', fWater: 'Для плавания (300м+)', fReserve: 'Запас хода 60ч+ («на выходные»)',
     fSapphire: 'Только сапфировое стекло', fInStock: 'Только в наличии', resetAll: 'Сбросить все фильтры',
     found: 'Найдено моделей:', sortPop: 'По популярности', sortAsc: 'Цена: по возрастанию', sortDesc: 'Цена: по убыванию', sortDia: 'По диаметру',
-    empty: 'Ничего не нашлось. Ослабьте фильтры — или встаньте в лист ожидания, и мы привезём модель под вас.',
+    empty: 'Ничего не нашлось. Попробуйте ослабить фильтры.',
     filters: 'Фильтры:', clearAll: 'сбросить всё', filtersBtn: 'Фильтры', apply: 'Показать {n}',
   },
   product: {
@@ -123,6 +128,11 @@ const en: Dict = {
     earnPoints: '+{n} points', earnNote: 'Earn +{n} points to your bonus account with this purchase',
     firstBonusTip: 'Bonus for your first purchase at CHASI.UZ',
   },
+  wish: {
+    add: 'Add to wishlist', inList: 'In wishlist', remove: 'Remove from wishlist', added: 'Added to wishlist ✦', addedText: 'added to your wishlist',
+    label: 'Wishlist', title: 'Your', titleEm: 'wishlist',
+    empty: 'Your wishlist is empty', emptyText: 'Tap ♡ on cards — your favourites will appear here.', toCatalog: 'To catalog',
+  },
   book: {
     label: 'Service', title: 'Book a service',
     text: 'Leave a request — we will arrange a convenient day to service your watch. No queues: just come at the agreed time.',
@@ -167,7 +177,7 @@ const en: Dict = {
     specialTitle: 'Special filters ✦', fWater: 'For swimming (300m+)', fReserve: 'Power reserve 60h+ (“for the weekend”)',
     fSapphire: 'Sapphire glass only', fInStock: 'In stock only', resetAll: 'Reset all filters',
     found: 'Models found:', sortPop: 'By popularity', sortAsc: 'Price: low to high', sortDesc: 'Price: high to low', sortDia: 'By diameter',
-    empty: 'Nothing found. Loosen the filters — or join the waitlist and we will source the model for you.',
+    empty: 'Nothing found. Try loosening the filters.',
     filters: 'Filters:', clearAll: 'clear all', filtersBtn: 'Filters', apply: 'Show {n}',
   },
   product: {
@@ -229,6 +239,11 @@ const uz: Dict = {
     earnPoints: '+{n} ball', earnNote: 'Ushbu xarid uchun bonus hisobingizga +{n} ball olasiz',
     firstBonusTip: 'CHASI.UZ dagi birinchi xaridingiz uchun bonus',
   },
+  wish: {
+    add: 'Sevimlilarga', inList: 'Sevimlilarda', remove: 'Sevimlilardan olib tashlash', added: 'Sevimlilarga qoʻshildi ✦', addedText: 'sevimlilarga qoʻshildi',
+    label: 'Sevimlilar', title: 'Sevimli', titleEm: 'soatlar',
+    empty: 'Sevimlilar boʻsh', emptyText: 'Kartalarda ♡ bosing — yoqqan soatlar shu yerda paydo boʻladi.', toCatalog: 'Katalogga',
+  },
   book: {
     label: 'Servis', title: 'Texnik xizmatga yozilish',
     text: 'Ariza qoldiring — soatingizga xizmat koʻrsatish uchun qulay kunni tanlaymiz. Navbatsiz: belgilangan vaqtda keling.',
@@ -273,7 +288,7 @@ const uz: Dict = {
     specialTitle: 'Maxsus filtrlar ✦', fWater: 'Suzish uchun (300m+)', fReserve: 'Yurish zaxirasi 60s+ (“dam olish uchun”)',
     fSapphire: 'Faqat sapfir shisha', fInStock: 'Faqat mavjud', resetAll: 'Barcha filtrlarni tozalash',
     found: 'Topilgan modellar:', sortPop: 'Ommaboplik boʻyicha', sortAsc: 'Narx: arzondan qimmatga', sortDesc: 'Narx: qimmatdan arzonga', sortDia: 'Diametr boʻyicha',
-    empty: 'Hech narsa topilmadi. Filtrlarni yumshating — yoki kutish roʻyxatiga yoziling, modelni siz uchun olib kelamiz.',
+    empty: 'Hech narsa topilmadi. Filtrlarni yumshatib koʻring.',
     filters: 'Filtrlar:', clearAll: 'hammasini tozalash', filtersBtn: 'Filtrlar', apply: '{n} ta koʻrsatish',
   },
   product: {

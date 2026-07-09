@@ -5,6 +5,7 @@ import { useCart } from '../store/cart'
 import { effectivePrice, isLastOne, isLowStock, useProducts } from '../store/products'
 import { catalogLink, relatedProducts } from '../store/tags'
 import EarnBadge from '../components/EarnBadge'
+import WishBtn from '../components/WishBtn'
 import { useI18n } from '../i18n/engine'
 import { toast } from '../toast'
 
@@ -66,10 +67,7 @@ export default function Product() {
       toast({ kind: 'gold', title: 'Нужна авторизация ✦', text: 'Корзина и цены доступны только клиентам. Нажмите «Войти» вверху справа — и добавляйте часы в корзину.' })
       return
     }
-    if (!p.inStock) {
-      toast({ title: 'Вы в листе ожидания ✦', text: `«${p.name}» — сообщим в Telegram в день поступления. Внесите депозит, чтобы зафиксировать цену и приоритет.` })
-      return
-    }
+    if (!p.inStock) return
     add(p.id)
     toast({ kind: 'gold', title: 'Добавлено в корзину', text: `${p.name} — теперь в корзине. Оформите заказ с доставкой и, при желании, подарочным боксом.` })
   }
@@ -135,12 +133,13 @@ export default function Product() {
           )}
 
           <div className="product-actions">
-            <button className="btn btn-gold" onClick={addToCart}>
-              {!authed ? t('common.buyLoginFirst') : p.inStock ? (inCart ? t('common.inCart', { n: inCart }) : t('common.addToCart')) : t('common.queue')}
+            <button className="btn btn-gold" onClick={addToCart} disabled={!p.inStock} style={{ opacity: p.inStock ? 1 : 0.5 }}>
+              {!authed ? t('common.buyLoginFirst') : p.inStock ? (inCart ? t('common.inCart', { n: inCart }) : t('common.addToCart')) : t('enum.stockOrder')}
             </button>
             {authed && inCart > 0 && (
               <button className="btn btn-ghost" onClick={() => navigate('/cart')}>{t('common.goToCart')}</button>
             )}
+            <WishBtn id={p.id} name={p.name} />
           </div>
 
           <div className="product-note muted">
