@@ -9,8 +9,10 @@ import Account from './pages/Account'
 import Admin from './pages/Admin'
 import ProductEdit from './pages/ProductEdit'
 import Loyalty from './pages/Loyalty'
+import WishlistPage from './pages/Wishlist'
 import Passport from './pages/Passport'
 import { CartProvider, useCart } from './store/cart'
+import { WishlistProvider, useWishlist } from './store/wishlist'
 import { I18nProvider, LANGS, useI18n } from './i18n/engine'
 import { initTelegram, isTelegram } from './telegram'
 import { onToast, toast, ToastMsg } from './toast'
@@ -75,6 +77,7 @@ function Header() {
   const { authed, toggle } = useAuth()
   const { theme, setTheme } = useTheme()
   const { count } = useCart()
+  const { count: wishCount } = useWishlist()
   const { lang, setLang, t } = useI18n()
   const [open, setOpen] = useState(false)
   const cls = ({ isActive }: { isActive: boolean }) => (isActive ? 'active' : '')
@@ -100,6 +103,12 @@ function Header() {
               </button>
             ))}
           </div>
+          <NavLink to="/wishlist" className="cart-link" title={t('wish.label')} onClick={() => setOpen(false)}>
+            <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M12 20.5s-7.5-4.7-9.7-9.2C.9 8.5 2.2 5.4 5.2 5c1.9-.2 3.5.9 4.3 2.3L12 10l2.5-2.7C15.3 5.9 16.9 4.8 18.8 5c3 .4 4.3 3.5 2.9 6.3-2.2 4.5-9.7 9.2-9.7 9.2Z" />
+            </svg>
+            {wishCount > 0 && <span className="cart-count">{wishCount}</span>}
+          </NavLink>
           <NavLink to="/cart" className="cart-link" title="Корзина" onClick={() => setOpen(false)}>
             <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d="M4.5 7.5h15l-1.1 11.2a1.6 1.6 0 0 1-1.6 1.45H7.2a1.6 1.6 0 0 1-1.6-1.45L4.5 7.5Z" />
@@ -203,6 +212,7 @@ export default function App() {
       <I18nProvider>
       <HashRouter>
         <CartProvider>
+        <WishlistProvider>
         <ScrollToTop />
         <div className={authed ? 'authed' : ''} data-theme={theme}>
           <Header />
@@ -213,6 +223,7 @@ export default function App() {
               <Route path="/product/:id" element={<Product />} />
               <Route path="/gift-sets" element={<GiftSets />} />
               <Route path="/loyalty" element={<Loyalty />} />
+              <Route path="/wishlist" element={<WishlistPage />} />
               <Route path="/cart" element={<Cart />} />
               <Route path="/account" element={<Account />} />
               <Route path="/admin" element={<Admin />} />
@@ -223,6 +234,7 @@ export default function App() {
           </div>
           <ToastHost />
         </div>
+        </WishlistProvider>
         </CartProvider>
       </HashRouter>
       </I18nProvider>

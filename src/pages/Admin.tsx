@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { clients, Client, demand, DISCOUNT_OPTIONS, DISCOUNT_PIN, giftSets, GIFT_BOX, interests, OnlineOrder, PAYMENT_LABEL, products, Sale, salesMock, serviceDue, views7d, dailyVisits } from '../data/mock'
+import { clients, Client, DISCOUNT_OPTIONS, DISCOUNT_PIN, giftSets, GIFT_BOX, interests, OnlineOrder, PAYMENT_LABEL, products, Sale, salesMock, serviceDue, views7d, dailyVisits } from '../data/mock'
 import { updateOrderStatus, useOrders } from '../store/orders'
 import { effectivePrice, isLowStock, setDiscount, setStock, useProducts } from '../store/products'
 import { setBookingStatus, useBookings } from '../store/bookings'
 import { toast } from '../toast'
 
-type Tab = 'dash' | 'products' | 'weborders' | 'bookings' | 'neworder' | 'sales' | 'interest' | 'demand' | 'service' | 'clients'
+type Tab = 'dash' | 'products' | 'weborders' | 'bookings' | 'neworder' | 'sales' | 'interest' | 'service' | 'clients'
 
 type Prefill = { productId: number; clientId: number; orderId?: string }
 
@@ -597,7 +597,6 @@ export default function Admin() {
         <button className={tab === 'neworder' ? 'on' : ''} onClick={() => setTab('neworder')}>＋ Новый заказ</button>
         <button className={tab === 'sales' ? 'on' : ''} onClick={() => setTab('sales')}>▤ Продажи</button>
         <button className={tab === 'interest' ? 'on' : ''} onClick={() => setTab('interest')}>♦ Интересы клиентов</button>
-        <button className={tab === 'demand' ? 'on' : ''} onClick={() => setTab('demand')}>◈ Спрос · лист ожидания</button>
         <button className={tab === 'service' ? 'on' : ''} onClick={() => setTab('service')}>⌚ Скоро ТО</button>
         <button className={tab === 'clients' ? 'on' : ''} onClick={() => setTab('clients')}>◉ Клиенты</button>
       </aside>
@@ -675,37 +674,6 @@ export default function Admin() {
                 })}
               </tbody>
             </table>
-          </>
-        )}
-
-        {tab === 'demand' && (
-          <>
-            <span className="sec-label">CRM · закупки по спросу</span>
-            <h2 style={{ marginBottom: 8 }}>Лист ожидания</h2>
-            <p className="muted" style={{ fontSize: '.82rem', marginBottom: 26, fontWeight: 300 }}>
-              Модели, которых нет в наличии, но клиенты хотят купить. Закупайте под подтверждённый спрос, а не наугад.
-            </p>
-            <table className="tbl">
-              <thead><tr><th>Модель</th><th>В очереди</th><th>С депозитом</th><th>Средний бюджет</th><th></th></tr></thead>
-              <tbody>
-                {demand.map(d => (
-                  <tr key={d.id}>
-                    <td>{d.model}</td>
-                    <td><span className="pill b">{d.queue} чел.</span></td>
-                    <td>{d.deposits > 0 ? <span className="pill g">{d.deposits} · деньги внесены</span> : <span className="pill r">0</span>}</td>
-                    <td style={{ color: 'var(--gold2)' }}>{d.avgBudget.toLocaleString('ru-RU')} $</td>
-                    <td><button className="btn btn-ghost btn-sm" onClick={() => toast({ kind: 'gold', title: 'Поставка запланирована', text: `«${d.model}» добавлена в план закупки. При поступлении все ${d.queue} клиентов получат уведомление автоматически.` })}>Заказать поставку</button></td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            <div className="panel" style={{ marginTop: 26 }}>
-              <h3>Потенциальная выручка листа ожидания</h3>
-              <div className="sub">Если привезти всё, что просят клиенты</div>
-              <div style={{ fontFamily: 'var(--serif)', fontSize: '2.6rem', color: 'var(--gold2)' }}>
-                ≈ {demand.reduce((s, d) => s + d.queue * d.avgBudget, 0).toLocaleString('ru-RU')} $
-              </div>
-            </div>
           </>
         )}
 

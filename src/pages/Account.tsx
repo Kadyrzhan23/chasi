@@ -3,8 +3,10 @@ import { Link } from 'react-router-dom'
 import QR from '../components/QR'
 import WatchVisual from '../components/WatchVisual'
 import ServiceBooking from '../components/ServiceBooking'
-import { myNotifications, myPurchases, myWishlist, products } from '../data/mock'
+import { myNotifications, myPurchases, products } from '../data/mock'
 import { useMyBookings } from '../store/bookings'
+import { useWishlist } from '../store/wishlist'
+import { useProducts } from '../store/products'
 import { toast } from '../toast'
 
 type Tab = 'watches' | 'wishlist' | 'requests' | 'notif'
@@ -13,6 +15,11 @@ export default function Account() {
   const [tab, setTab] = useState<Tab>('watches')
   const myBookings = useMyBookings()
   const newReq = myBookings.filter(b => b.status === 'новая').length
+  const { ids: wishIds, remove: wishRemove } = useWishlist()
+  const shopProducts = useProducts()
+  const wishItems = wishIds
+    .map(id => shopProducts.find(p => p.id === id))
+    .filter((p): p is NonNullable<typeof p> => !!p)
 
   const prod = (id: number) => products.find(p => p.id === id)!
 
@@ -38,7 +45,7 @@ export default function Account() {
         </div>
         <nav>
           <button className={tab === 'watches' ? 'on' : ''} onClick={() => setTab('watches')}>Мои часы · паспорта</button>
-          <button className={tab === 'wishlist' ? 'on' : ''} onClick={() => setTab('wishlist')}>Wishlist · очередь</button>
+          <button className={tab === 'wishlist' ? 'on' : ''} onClick={() => setTab('wishlist')}>Избранное</button>
           <button className={tab === 'requests' ? 'on' : ''} onClick={() => setTab('requests')}>
             Мои запросы {newReq > 0 && <span className="side-badge">{newReq}</span>}
           </button>
@@ -102,28 +109,31 @@ export default function Account() {
         {tab === 'wishlist' && (
           <>
             <div className="sec-head" style={{ marginBottom: 30 }}>
-              <div><span className="sec-label">Личный кабинет</span><h2>Список желаний</h2></div>
+              <div><span className="sec-label">Личный кабинет</span><h2>Избранное</h2></div>
+              <Link className="btn btn-ghost btn-sm" to="/wishlist">Открыть избранное →</Link>
             </div>
-            <table className="tbl">
-              <thead><tr><th>Модель</th><th>Статус</th><th>Комментарий</th><th></th></tr></thead>
-              <tbody>
-                {myWishlist.map(w => (
-                  <tr key={w.id}>
-                    <td>{w.model}</td>
-                    <td>{w.inStock
-                      ? <span className="pill g">в наличии</span>
-                      : <span className="pill r">нет в наличии · №{w.queuePos} в очереди</span>}
-                    </td>
-                    <td className="muted">{w.note}</td>
-                    <td>
-                      {w.inStock
-                        ? <button className="btn btn-gold btn-sm" onClick={() => toast({ kind: 'gold', title: 'Бронь оформлена ✦', text: `«${w.model}» отложена для вас на 72 часа в бутике на Мирабад, 12.` })}>Забронировать</button>
-                        : <button className="btn btn-ghost btn-sm" onClick={() => toast({ title: 'Депозит ✦', text: `Внесите депозит через Click или Payme — получите приоритет №1 в очереди и фиксацию цены на «${w.model}».` })}>Внести депозит</button>}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            {wishItems.length === 0 ? (
+              <div className="empty">В избранном пусто. Нажимайте ♡ на карточках товаров — они появятся здесь.</div>
+            ) : (
+              <table className="tbl">
+                <thead><tr><th>Модель</th><th>Статус</th><th>Цена</th><th></th></tr></thead>
+                <tbody>
+                  {wishItems.map(p => (
+                    <tr key={p.id}>
+                      <td>{p.name}<div className="muted" style={{ fontSize: '.7rem' }}>{p.brand} · ⌀{p.diameter}мм</div></td>
+                      <td>{p.inStock ? <span className="pill g">в наличии</span> : <span className="pill r">под заказ</span>}</td>
+                      <td style={{ color: 'var(--gold2)' }}>{p.price.toLocaleString('ru-RU')} $</td>
+                      <td>
+                        <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                          <Link className="btn btn-ghost btn-sm" to={`/product/${p.id}`}>Открыть</Link>
+                          <button className="link-del" onClick={() => wishRemove(p.id)}>Убрать</button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
           </>
         )}
 

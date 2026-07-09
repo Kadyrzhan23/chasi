@@ -126,17 +126,6 @@ export const dailyVisits = [
   { day: 'Вс', visits: 301 }, { day: 'Пн', visits: 190 }, { day: 'Вт', visits: 226 }, { day: 'Ср', visits: 254 },
 ]
 
-/* ============ CRM: лист ожидания / спрос ============ */
-export type Demand = { id: number; model: string; brand: string; queue: number; deposits: number; avgBudget: number }
-
-export const demand: Demand[] = [
-  { id: 1, model: 'Rolex Submariner Date (оригинал)', brand: 'Rolex',  queue: 14, deposits: 3, avgBudget: 12500 },
-  { id: 2, model: 'Patek Philippe Aquanaut (1:1 swiss)', brand: 'Patek Philippe', queue: 9, deposits: 2, avgBudget: 900 },
-  { id: 3, model: 'Omega Speedmaster Moonwatch (оригинал)', brand: 'Omega', queue: 7, deposits: 1, avgBudget: 6800 },
-  { id: 4, model: 'Rolex GMT-Master II «Pepsi» (1:1 swiss)', brand: 'Rolex', queue: 6, deposits: 2, avgBudget: 850 },
-  { id: 5, model: 'Cartier Tank Must (оригинал)', brand: 'Cartier', queue: 5, deposits: 0, avgBudget: 3100 },
-]
-
 /* ============ CRM: продажи (для отчёта и создания заказов) ============ */
 export type Sale = {
   id: number
@@ -276,14 +265,6 @@ export const passports: PassportInfo[] = [
     freeVisitsTotal: 2, freeVisitsUsed: 1,
     verifiedDate: '02.12.2024', verifiedBy: 'Бутик CHASI.UZ · Ташкент, Мирабад 12',
   },
-]
-
-export type WishItem = { id: number; model: string; inStock: boolean; queuePos?: number; note: string }
-
-export const myWishlist: WishItem[] = [
-  { id: 1, model: 'Rolex Submariner Date (оригинал)', inStock: false, queuePos: 4,  note: 'Вы в листе ожидания. Сообщим в день поступления.' },
-  { id: 2, model: 'Omega Seamaster Diver 300M',       inStock: true,               note: 'В наличии в бутике — забронировать?' },
-  { id: 3, model: 'Longines HydroConquest 41мм',      inStock: true,               note: 'Вы смотрели эту модель 6 раз — доступна скидка −10%.' },
 ]
 
 export const myNotifications = [
