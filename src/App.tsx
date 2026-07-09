@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from 'react'
-import { HashRouter, NavLink, Route, Routes } from 'react-router-dom'
+import { HashRouter, NavLink, Route, Routes, useLocation } from 'react-router-dom'
 import Home from './pages/Home'
 import Catalog from './pages/Catalog'
 import Product from './pages/Product'
@@ -26,6 +26,13 @@ export const THEMES: { id: Theme; n: string; label: string }[] = [
 ]
 const ThemeCtx = createContext<{ theme: Theme; setTheme: (t: Theme) => void }>({ theme: 'noir', setTheme: () => {} })
 export const useTheme = () => useContext(ThemeCtx)
+
+/* ---------- сброс скролла наверх при смене страницы ---------- */
+function ScrollToTop() {
+  const { pathname } = useLocation()
+  useEffect(() => { window.scrollTo(0, 0) }, [pathname])
+  return null
+}
 
 /* ---------- toast host ---------- */
 function ToastHost() {
@@ -181,6 +188,7 @@ export default function App() {
       <I18nProvider>
       <HashRouter>
         <CartProvider>
+        <ScrollToTop />
         <div className={authed ? 'authed' : ''} data-theme={theme}>
           <Header />
           <div className="page">

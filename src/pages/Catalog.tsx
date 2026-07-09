@@ -38,6 +38,7 @@ export default function Catalog() {
   const [ptype, setPType] = useState<PType>('all')
   const [movement, setMovement] = useState('')
   const [sort, setSort] = useState('pop')
+  const [filtersOpen, setFiltersOpen] = useState(false)
 
   // Применяем фильтры из URL (?brand=, ?cat=, ?style=, ?stock=, ?type=, ?movement=).
   // Работает и при переходе по тегу на уже открытый каталог.
@@ -54,6 +55,12 @@ export default function Catalog() {
     setPType(t === 'orig' ? 'orig' : t === 'replica' ? 'replica' : 'all')
     setMovement(sp.get('movement') ?? '')
   }, [sp])
+
+  // блокируем скролл фона, пока открыта мобильная панель фильтров
+  useEffect(() => {
+    document.body.classList.toggle('no-scroll', filtersOpen)
+    return () => document.body.classList.remove('no-scroll')
+  }, [filtersOpen])
 
   const shopProducts = useProducts()
 
@@ -113,8 +120,15 @@ export default function Catalog() {
       </section>
 
       <div className="catalog">
+        {/* мобильный бэкдроп */}
+        {filtersOpen && <div className="filters-backdrop" onClick={() => setFiltersOpen(false)} />}
+
         {/* -------- ФИЛЬТРЫ -------- */}
-        <aside className="filters">
+        <aside className={`filters ${filtersOpen ? 'open' : ''}`}>
+          <div className="filters-m-head">
+            <span>{t('catalog.filtersBtn')}</span>
+            <button className="filters-close" aria-label="Закрыть" onClick={() => setFiltersOpen(false)}>✕</button>
+          </div>
           <input className="search-inp" placeholder={t('catalog.search')} value={q} onChange={e => setQ(e.target.value)} />
 
           <div className="fgroup">
@@ -188,10 +202,18 @@ export default function Catalog() {
           </div>
 
           <button className="reset-btn" onClick={reset}>{t('catalog.resetAll')}</button>
+
+          {/* мобильная кнопка «Показать N» — закрывает панель */}
+          <button className="filters-apply btn btn-gold" onClick={() => setFiltersOpen(false)}>{t('catalog.apply', { n: list.length })}</button>
         </aside>
 
         {/* -------- СПИСОК -------- */}
         <div>
+          {/* мобильная кнопка открытия фильтров */}
+          <button className="filters-toggle" onClick={() => setFiltersOpen(true)}>
+            ☰ {t('catalog.filtersBtn')}{activeFilters.length > 0 && ` · ${activeFilters.length}`}
+          </button>
+
           <div className="cat-top">
             <div className="muted" style={{ fontSize: '.82rem' }}>{t('catalog.found')} <b style={{ color: 'var(--gold2)' }}>{list.length}</b></div>
             <select className="select" value={sort} onChange={e => setSort(e.target.value)}>

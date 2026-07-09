@@ -62,7 +62,7 @@ const ru: Dict = {
     fSapphire: 'Только сапфировое стекло', fInStock: 'Только в наличии', resetAll: 'Сбросить все фильтры',
     found: 'Найдено моделей:', sortPop: 'По популярности', sortAsc: 'Цена: по возрастанию', sortDesc: 'Цена: по убыванию', sortDia: 'По диаметру',
     empty: 'Ничего не нашлось. Ослабьте фильтры — или встаньте в лист ожидания, и мы привезём модель под вас.',
-    filters: 'Фильтры:', clearAll: 'сбросить всё',
+    filters: 'Фильтры:', clearAll: 'сбросить всё', filtersBtn: 'Фильтры', apply: 'Показать {n}',
   },
   product: {
     crumb: 'Каталог', specsTitle: 'Характеристики',
@@ -168,7 +168,7 @@ const en: Dict = {
     fSapphire: 'Sapphire glass only', fInStock: 'In stock only', resetAll: 'Reset all filters',
     found: 'Models found:', sortPop: 'By popularity', sortAsc: 'Price: low to high', sortDesc: 'Price: high to low', sortDia: 'By diameter',
     empty: 'Nothing found. Loosen the filters — or join the waitlist and we will source the model for you.',
-    filters: 'Filters:', clearAll: 'clear all',
+    filters: 'Filters:', clearAll: 'clear all', filtersBtn: 'Filters', apply: 'Show {n}',
   },
   product: {
     crumb: 'Catalog', specsTitle: 'Specifications',
@@ -274,7 +274,7 @@ const uz: Dict = {
     fSapphire: 'Faqat sapfir shisha', fInStock: 'Faqat mavjud', resetAll: 'Barcha filtrlarni tozalash',
     found: 'Topilgan modellar:', sortPop: 'Ommaboplik boʻyicha', sortAsc: 'Narx: arzondan qimmatga', sortDesc: 'Narx: qimmatdan arzonga', sortDia: 'Diametr boʻyicha',
     empty: 'Hech narsa topilmadi. Filtrlarni yumshating — yoki kutish roʻyxatiga yoziling, modelni siz uchun olib kelamiz.',
-    filters: 'Filtrlar:', clearAll: 'hammasini tozalash',
+    filters: 'Filtrlar:', clearAll: 'hammasini tozalash', filtersBtn: 'Filtrlar', apply: '{n} ta koʻrsatish',
   },
   product: {
     crumb: 'Katalog', specsTitle: 'Xususiyatlar',
