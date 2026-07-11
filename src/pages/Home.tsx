@@ -7,6 +7,7 @@ import { effectivePrice, isLowStock, useProducts } from '../store/products'
 import EarnBadge from '../components/EarnBadge'
 import ServiceBooking from '../components/ServiceBooking'
 import { useI18n } from '../i18n/engine'
+import { useReveal, useCardTilt } from '../hooks/cardMotion'
 
 const HERO_PHOTO: Record<string, string> = {
   onyx: 'https://images.unsplash.com/photo-1547996160-81dfa63595aa?auto=format&fit=crop&w=1000&q=80',
@@ -15,18 +16,6 @@ const FOUNDER_PHOTO = 'https://images.unsplash.com/photo-1434056886845-dac89ffe9
 
 const FEATURED_IDS = [1, 2, 3, 7]
 const brandsRow = ['ROLEX', 'AUDEMARS PIGUET', 'PATEK PHILIPPE', 'TISSOT', 'LONGINES', 'FRÉDÉRIQUE CONSTANT', 'ALPINA', 'ORIENT']
-
-/* плавное появление секций */
-function useReveal() {
-  useEffect(() => {
-    const io = new IntersectionObserver(
-      es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target) } }),
-      { threshold: 0.15 },
-    )
-    document.querySelectorAll('.reveal').forEach(el => io.observe(el))
-    return () => io.disconnect()
-  }, [])
-}
 
 function Counter({ end, suffix = '' }: { end: number; suffix?: string }) {
   const [v, setV] = useState(0)
@@ -51,13 +40,14 @@ function Counter({ end, suffix = '' }: { end: number; suffix?: string }) {
 }
 
 export default function Home() {
-  useReveal()
   const navigate = useNavigate()
   const { authed } = useAuth()
   const { theme } = useTheme()
   const { t } = useI18n()
   const shopProducts = useProducts()
   const featured = shopProducts.filter(p => FEATURED_IDS.includes(p.id))
+  useReveal(featured.length)
+  useCardTilt(featured.length)
 
   const openProduct = (id: number) => navigate(`/product/${id}`)
 
@@ -66,15 +56,15 @@ export default function Home() {
       {/* HERO */}
       <section className="hero">
         <div>
-          <span className="hero-tag">{t('home.heroTag')}</span>
-          <h1 className="big">{t('home.heroTitle1')}<br />{t('home.heroTitle2')} <em>{t('home.heroTitleEm')}</em>{t('home.heroTitle3') && <>,<br />{t('home.heroTitle3')}</>}</h1>
-          <p>{t('home.heroText')}</p>
-          <div className="hero-cta">
+          <span className="hero-tag hero-in d1">{t('home.heroTag')}</span>
+          <h1 className="big hero-in d2">{t('home.heroTitle1')}<br />{t('home.heroTitle2')} <em>{t('home.heroTitleEm')}</em>{t('home.heroTitle3') && <>,<br />{t('home.heroTitle3')}</>}</h1>
+          <p className="hero-in d3">{t('home.heroText')}</p>
+          <div className="hero-cta hero-in d4">
             <Link to="/catalog" className="btn btn-gold">{t('home.ctaCollection')}</Link>
             <Link to="/gift-sets" className="btn btn-ghost">{t('nav.gifts')}</Link>
           </div>
         </div>
-        <div className="hero-watch">
+        <div className="hero-watch hero-watch-in">
           {theme === 'noir'
             ? <WatchSVG dial={['#1d2430', '#0b0e14']} accent="#d4af6a" live />
             : <img className="hero-img" src={HERO_PHOTO[theme]} alt="CHASI.UZ" />}
@@ -96,7 +86,7 @@ export default function Home() {
         </div>
         <div className="grid4">
           {featured.map((p, i) => (
-            <div key={p.id} className="card reveal" style={{ transitionDelay: `${i * 0.1}s` }} onClick={() => openProduct(p.id)}>
+            <div key={p.id} className="card tilt-card reveal" style={{ transitionDelay: `${i * 0.1}s` }} onClick={() => openProduct(p.id)}>
               <div className="card-corner left">
                 <span className={`cbadge ${p.category === 'original' ? 'orig' : 'copy'}`}>{t(`enum.catShort.${p.category}`)}</span>
                 {p.discount > 0 && <span className="cbadge gold">−{p.discount}%</span>}

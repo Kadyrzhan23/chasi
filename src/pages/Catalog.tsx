@@ -7,6 +7,7 @@ import { effectivePrice, isLowStock, useProducts } from '../store/products'
 import { catalogLink } from '../store/tags'
 import EarnBadge from '../components/EarnBadge'
 import { useI18n } from '../i18n/engine'
+import { useReveal, useCardTilt } from '../hooks/cardMotion'
 
 type Wrist = 'any' | 'slim' | 'mid' | 'wide'
 const WRIST_KEY: Record<Wrist, string> = {
@@ -91,6 +92,9 @@ export default function Catalog() {
     if (sort === 'dia') r = [...r].sort((a, b) => a.diameter - b.diameter)
     return r
   }, [shopProducts, q, cat, ptype, movement, selBrands, gender, styles, pMin, pMax, wrist, water300, reserve60, sapphire, avail, sort])
+
+  useReveal(list.length)
+  useCardTilt(list.length)
 
   const brandCount = (b: string) => products.filter(p => p.brand === b).length
 
@@ -239,8 +243,8 @@ export default function Catalog() {
           )}
 
           <div className="grid3">
-            {list.map(p => (
-              <div key={p.id} className="card" onClick={() => navigate(`/product/${p.id}`)}>
+            {list.map((p, i) => (
+              <div key={p.id} className="card tilt-card reveal" style={{ transitionDelay: `${(i % 3) * 0.06}s` }} onClick={() => navigate(`/product/${p.id}`)}>
                 {/* слева сверху — тип товара + скидка (клик = фильтр) */}
                 <div className="card-corner left">
                   <Link className={`cbadge ${p.category === 'original' ? 'orig' : 'copy'}`} to={catalogLink({ cat: p.category })} onClick={e => e.stopPropagation()}>{t(`enum.catShort.${p.category}`)}</Link>
